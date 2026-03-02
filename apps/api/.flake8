@@ -1,0 +1,33 @@
+[flake8]
+max-line-length = 100
+# Codes ignored to avoid conflicts with black and ruff
+# E1/W1: indentation — handled by black
+# E2/W2: whitespace — handled by black
+# E3/W3: blank lines — handled by black
+# E4: imports — handled by ruff/isort
+# E5: line length — enforced separately via max-line-length
+# W5: line break warnings — handled by black
+# W6: deprecated feature warnings
+extend-ignore =
+    # black formats these; flagging them causes false positives
+    E203,   # whitespace before ':'  (black compatible)
+    E501,   # line too long (enforced by max-line-length above)
+    W503,   # line break before binary operator (conflicts with black)
+    W504,   # line break after binary operator
+    # ruff covers these better
+    B008,   # function call in default argument (FastAPI Depends)
+per-file-ignores =
+    # Allow unused imports in package init files
+    __init__.py: F401
+    # Migration files — auto-generated, don't lint them
+    alembic/versions/*.py: ALL
+exclude =
+    .git,
+    __pycache__,
+    .mypy_cache,
+    .ruff_cache,
+    .venv,
+    venv,
+    alembic/versions,
+    build,
+    dist
