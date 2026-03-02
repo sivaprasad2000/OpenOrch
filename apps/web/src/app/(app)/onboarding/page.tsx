@@ -43,16 +43,16 @@ export default function OnboardingPage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <Spinner size="lg" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-24 bg-background">
-      <div className="max-w-md w-full space-y-12">
-        <Link href="/" className="block hover:text-accent transition-colors">
+    <div className="flex min-h-screen items-center justify-center bg-background px-6 py-24">
+      <div className="w-full max-w-md space-y-12">
+        <Link href="/" className="block transition-colors hover:text-accent">
           <h1 className="font-mono text-5xl tracking-tight">OpenOrch</h1>
         </Link>
 
@@ -76,12 +76,12 @@ export default function OnboardingPage() {
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
               autoFocus
-              className="w-full px-4 py-3 bg-background border-2 border-foreground/20 text-foreground placeholder:text-foreground/40 font-mono focus:outline-none focus:border-accent transition-colors"
+              className="w-full border-2 border-foreground/20 bg-background px-4 py-3 font-mono text-foreground transition-colors placeholder:text-foreground/40 focus:border-accent focus:outline-none"
             />
           </div>
 
           {error && (
-            <div className="p-3 border-2 border-red-500 bg-red-500/10">
+            <div className="border-2 border-red-500 bg-red-500/10 p-3">
               <p className="font-mono text-sm text-red-500">{error}</p>
             </div>
           )}
@@ -89,7 +89,7 @@ export default function OnboardingPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-8 py-4 border-2 border-transparent bg-accent text-black font-mono text-lg font-semibold hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full border-2 border-transparent bg-accent px-8 py-4 font-mono text-lg font-semibold text-black transition-colors hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? 'Creating...' : 'Create organization →'}
           </button>

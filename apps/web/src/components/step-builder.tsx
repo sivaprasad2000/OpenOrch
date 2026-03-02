@@ -2,9 +2,18 @@
 
 import { useEffect, useRef, useState } from 'react'
 import {
-  Plus, Trash2, GripVertical,
-  ChevronDown, ChevronUp,
-  Navigation, MousePointer, Type, List, Hand, Clock, Check,
+  Plus,
+  Trash2,
+  GripVertical,
+  ChevronDown,
+  ChevronUp,
+  Navigation,
+  MousePointer,
+  Type,
+  List,
+  Hand,
+  Clock,
+  Check,
 } from 'lucide-react'
 
 // ─── types ────────────────────────────────────────────────────────────────────
@@ -23,14 +32,20 @@ export interface BuiltStep {
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
 let _counter = 0
-export function nextStepId() { return `step-${++_counter}` }
+export function nextStepId() {
+  return `step-${++_counter}`
+}
 
 export function buildStep(draft: StepDraft): BuiltStep {
   return { action: draft.action, description: draft.description }
 }
 
 export function parseDraft(step: BuiltStep): StepDraft {
-  return { id: nextStepId(), action: step.action, description: step.description }
+  return {
+    id: nextStepId(),
+    action: step.action,
+    description: step.description,
+  }
 }
 
 // ─── constants ────────────────────────────────────────────────────────────────
@@ -41,12 +56,12 @@ const INPUT_CLS =
 // ─── ActionSelect ─────────────────────────────────────────────────────────────
 
 const ACTION_META: Record<string, { icon: React.ReactNode; hint: string }> = {
-  navigate: { icon: <Navigation  size={12} />, hint: 'go to a URL' },
-  click:    { icon: <MousePointer size={12} />, hint: 'click an element' },
-  type:     { icon: <Type         size={12} />, hint: 'enter text' },
-  select:   { icon: <List         size={12} />, hint: 'choose an option' },
-  hover:    { icon: <Hand         size={12} />, hint: 'hover over element' },
-  wait:     { icon: <Clock        size={12} />, hint: 'pause execution' },
+  navigate: { icon: <Navigation size={12} />, hint: 'go to a URL' },
+  click: { icon: <MousePointer size={12} />, hint: 'click an element' },
+  type: { icon: <Type size={12} />, hint: 'enter text' },
+  select: { icon: <List size={12} />, hint: 'choose an option' },
+  hover: { icon: <Hand size={12} />, hint: 'hover over element' },
+  wait: { icon: <Clock size={12} />, hint: 'pause execution' },
 }
 
 function ActionSelect({
@@ -67,7 +82,11 @@ function ActionSelect({
   useEffect(() => {
     if (!open) return
     function onMouse(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false)
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      )
+        setOpen(false)
     }
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') setOpen(false)
@@ -84,22 +103,25 @@ function ActionSelect({
   const hasLegacy = value && !actions.includes(value)
 
   return (
-    <div ref={containerRef} className="relative flex-1 min-w-0">
+    <div ref={containerRef} className="relative min-w-0 flex-1">
       {/* Trigger */}
       <button
         type="button"
         disabled={disabled}
         onClick={() => setOpen((v) => !v)}
-        className={`w-full flex items-center gap-2 px-3 py-1.5 border font-mono text-sm transition-colors bg-background disabled:opacity-40 disabled:cursor-not-allowed ${
+        className={`flex w-full items-center gap-2 border bg-background px-3 py-1.5 font-mono text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
           open
             ? 'border-accent text-foreground'
-            : 'border-foreground/20 hover:border-foreground/40 ' + (value ? 'text-foreground' : 'text-foreground/35')
+            : 'border-foreground/20 hover:border-foreground/40 ' +
+              (value ? 'text-foreground' : 'text-foreground/35')
         }`}
       >
-        <span className={`flex-shrink-0 transition-colors ${value ? 'text-accent' : 'text-foreground/25'}`}>
+        <span
+          className={`flex-shrink-0 transition-colors ${value ? 'text-accent' : 'text-foreground/25'}`}
+        >
           {meta?.icon ?? <MousePointer size={12} />}
         </span>
-        <span className="flex-1 text-left truncate">
+        <span className="flex-1 truncate text-left">
           {value || (disabled ? 'loading…' : 'select action…')}
         </span>
         <ChevronDown
@@ -110,17 +132,26 @@ function ActionSelect({
 
       {/* Panel */}
       {open && !disabled && (
-        <div className="absolute z-50 top-full left-0 right-0 mt-px border border-accent/40 bg-background">
+        <div className="absolute left-0 right-0 top-full z-50 mt-px border border-accent/40 bg-background">
           {/* Legacy value row */}
           {hasLegacy && (
             <button
               type="button"
-              onClick={() => { onChange(value); setOpen(false) }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-left bg-accent/[0.06] border-b border-border hover:bg-accent/[0.10] transition-colors"
+              onClick={() => {
+                onChange(value)
+                setOpen(false)
+              }}
+              className="flex w-full items-center gap-2.5 border-b border-border bg-accent/[0.06] px-3 py-2 text-left transition-colors hover:bg-accent/[0.10]"
             >
-              <span className="text-foreground/30 flex-shrink-0"><MousePointer size={12} /></span>
-              <span className="font-mono text-sm text-foreground/60 flex-1 truncate">{value}</span>
-              <span className="font-mono text-[10px] text-foreground/30 flex-shrink-0">legacy</span>
+              <span className="flex-shrink-0 text-foreground/30">
+                <MousePointer size={12} />
+              </span>
+              <span className="flex-1 truncate font-mono text-sm text-foreground/60">
+                {value}
+              </span>
+              <span className="flex-shrink-0 font-mono text-[10px] text-foreground/30">
+                legacy
+              </span>
             </button>
           )}
 
@@ -132,24 +163,29 @@ function ActionSelect({
               <button
                 key={a}
                 type="button"
-                onClick={() => { onChange(a); setOpen(false) }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors group ${
+                onClick={() => {
+                  onChange(a)
+                  setOpen(false)
+                }}
+                className={`group flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors ${
                   isSelected
                     ? 'bg-accent/[0.08] text-accent'
                     : 'text-foreground/60 hover:bg-foreground/[0.05] hover:text-foreground'
                 }`}
               >
-                <span className={`flex-shrink-0 transition-colors ${isSelected ? 'text-accent' : 'text-foreground/25 group-hover:text-foreground/50'}`}>
+                <span
+                  className={`flex-shrink-0 transition-colors ${isSelected ? 'text-accent' : 'text-foreground/25 group-hover:text-foreground/50'}`}
+                >
                   {m?.icon ?? <MousePointer size={12} />}
                 </span>
-                <span className="font-mono text-sm flex-1">{a}</span>
+                <span className="flex-1 font-mono text-sm">{a}</span>
                 {m?.hint && (
-                  <span className="font-mono text-[10px] text-foreground/25 flex-shrink-0 hidden group-hover:inline">
+                  <span className="hidden flex-shrink-0 font-mono text-[10px] text-foreground/25 group-hover:inline">
                     {m.hint}
                   </span>
                 )}
                 {isSelected && (
-                  <Check size={10} className="text-accent flex-shrink-0" />
+                  <Check size={10} className="flex-shrink-0 text-accent" />
                 )}
               </button>
             )
@@ -203,27 +239,40 @@ function StepCard({
     <div
       draggable
       onDragStart={(e) => {
-        if (!canDragRef.current) { e.preventDefault(); return }
+        if (!canDragRef.current) {
+          e.preventDefault()
+          return
+        }
         onDragStart()
       }}
-      onDragOver={(e) => { e.preventDefault(); onDragOver() }}
+      onDragOver={(e) => {
+        e.preventDefault()
+        onDragOver()
+      }}
       onDrop={onDrop}
-      onDragEnd={() => { canDragRef.current = false; onDragEnd() }}
+      onDragEnd={() => {
+        canDragRef.current = false
+        onDragEnd()
+      }}
       className={`border transition-all duration-100 ${
-        isDragging ? 'opacity-30 scale-[0.99]' : ''
+        isDragging ? 'scale-[0.99] opacity-30' : ''
       } ${isDraggedOver ? 'border-accent/60 bg-accent/[0.02]' : 'border-foreground/20 hover:border-foreground/30'}`}
     >
       {/* Header row: grip, index, action input, move, remove */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-foreground/[0.02]">
+      <div className="flex items-center gap-3 border-b border-border bg-foreground/[0.02] px-4 py-3">
         <div
-          className="cursor-grab active:cursor-grabbing text-foreground/20 hover:text-foreground/50 transition-colors flex-shrink-0 select-none"
-          onMouseDown={() => { canDragRef.current = true }}
-          onMouseUp={() => { canDragRef.current = false }}
+          className="flex-shrink-0 cursor-grab select-none text-foreground/20 transition-colors hover:text-foreground/50 active:cursor-grabbing"
+          onMouseDown={() => {
+            canDragRef.current = true
+          }}
+          onMouseUp={() => {
+            canDragRef.current = false
+          }}
         >
           <GripVertical size={14} />
         </div>
 
-        <span className="font-mono text-xs text-foreground/30 w-5 flex-shrink-0 select-none">
+        <span className="w-5 flex-shrink-0 select-none font-mono text-xs text-foreground/30">
           {String(index + 1).padStart(2, '0')}
         </span>
 
@@ -234,12 +283,12 @@ function StepCard({
           onChange={(a) => onChange({ ...draft, action: a })}
         />
 
-        <div className="flex flex-col flex-shrink-0">
+        <div className="flex flex-shrink-0 flex-col">
           <button
             type="button"
             onClick={onMoveUp}
             disabled={isFirst}
-            className="text-foreground/20 hover:text-foreground/60 transition-colors disabled:opacity-0 disabled:pointer-events-none"
+            className="text-foreground/20 transition-colors hover:text-foreground/60 disabled:pointer-events-none disabled:opacity-0"
             title="Move up"
           >
             <ChevronUp size={13} strokeWidth={1.5} />
@@ -248,7 +297,7 @@ function StepCard({
             type="button"
             onClick={onMoveDown}
             disabled={isLast}
-            className="text-foreground/20 hover:text-foreground/60 transition-colors disabled:opacity-0 disabled:pointer-events-none"
+            className="text-foreground/20 transition-colors hover:text-foreground/60 disabled:pointer-events-none disabled:opacity-0"
             title="Move down"
           >
             <ChevronDown size={13} strokeWidth={1.5} />
@@ -259,7 +308,7 @@ function StepCard({
           type="button"
           onClick={onRemove}
           disabled={isOnly}
-          className="text-foreground/20 hover:text-red-400 transition-colors disabled:opacity-20 disabled:cursor-not-allowed flex-shrink-0"
+          className="flex-shrink-0 text-foreground/20 transition-colors hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-20"
           title="Remove step"
         >
           <Trash2 size={14} strokeWidth={1.5} />
@@ -303,7 +352,9 @@ export function StepBuilder({
   }
 
   function updateStep(i: number, updated: StepDraft) {
-    const next = [...steps]; next[i] = updated; onChange(next)
+    const next = [...steps]
+    next[i] = updated
+    onChange(next)
   }
 
   function moveStep(from: number, to: number) {
@@ -323,13 +374,13 @@ export function StepBuilder({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-mono uppercase tracking-wider text-foreground/30">
+        <p className="font-mono text-xs uppercase tracking-wider text-foreground/30">
           Steps ({steps.length})
         </p>
         <button
           type="button"
           onClick={addStep}
-          className="inline-flex items-center gap-1.5 text-xs font-mono text-accent hover:underline"
+          className="inline-flex items-center gap-1.5 font-mono text-xs text-accent hover:underline"
         >
           <Plus size={12} strokeWidth={2} />
           Add step
@@ -355,7 +406,10 @@ export function StepBuilder({
             onDragStart={() => setDraggedIdx(i)}
             onDragOver={() => setDragOverIdx(i)}
             onDrop={() => handleDrop(i)}
-            onDragEnd={() => { setDraggedIdx(null); setDragOverIdx(null) }}
+            onDragEnd={() => {
+              setDraggedIdx(null)
+              setDragOverIdx(null)
+            }}
           />
         ))}
       </div>
@@ -363,7 +417,7 @@ export function StepBuilder({
       <button
         type="button"
         onClick={addStep}
-        className="w-full border border-dashed border-foreground/20 py-3 font-mono text-sm text-foreground/30 hover:border-accent hover:text-accent transition-colors inline-flex items-center justify-center gap-2"
+        className="inline-flex w-full items-center justify-center gap-2 border border-dashed border-foreground/20 py-3 font-mono text-sm text-foreground/30 transition-colors hover:border-accent hover:text-accent"
       >
         <Plus size={14} strokeWidth={1.5} />
         Add step

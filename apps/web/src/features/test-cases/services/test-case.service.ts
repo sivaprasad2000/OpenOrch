@@ -16,7 +16,11 @@ export const testCaseService = {
     return apiPost(`/api/v1/test-groups/${groupId}/test-cases`, data)
   },
 
-  update(groupId: string, id: string, data: TestCaseUpdate): Promise<TestCaseResponse> {
+  update(
+    groupId: string,
+    id: string,
+    data: TestCaseUpdate
+  ): Promise<TestCaseResponse> {
     return apiPut(`/api/v1/test-groups/${groupId}/test-cases/${id}`, data)
   },
 

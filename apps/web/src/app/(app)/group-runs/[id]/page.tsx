@@ -11,25 +11,42 @@ import { Spinner } from '@/components/ui/spinner'
 import { groupRunStatusToBadge, runStatusToBadge } from '@/lib/status'
 import { formatDateTime, shortId } from '@/lib/format'
 
-export default function GroupRunDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function GroupRunDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
   const { id } = use(params)
 
-  const { data: run, loading, error } = usePolling(
+  const {
+    data: run,
+    loading,
+    error,
+  } = usePolling(
     () => testRunService.getGroupRun(id),
     (data) => TERMINAL_GROUP_STATUSES.includes(data.status)
   )
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><Spinner size="lg" /></div>
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
   if (error || !run) {
     return (
       <div className="space-y-4">
-        <div className="p-3 border-2 border-red-500 bg-red-500/10">
-          <p className="font-mono text-sm text-red-500">{error ?? 'Run not found'}</p>
+        <div className="border-2 border-red-500 bg-red-500/10 p-3">
+          <p className="font-mono text-sm text-red-500">
+            {error ?? 'Run not found'}
+          </p>
         </div>
-        <Link href="/test-groups" className="font-mono text-sm text-accent hover:underline inline-flex items-center gap-1">
+        <Link
+          href="/test-groups"
+          className="inline-flex items-center gap-1 font-mono text-sm text-accent hover:underline"
+        >
           <ArrowLeft size={12} /> Back to Test Groups
         </Link>
       </div>
@@ -44,13 +61,19 @@ export default function GroupRunDetailPage({ params }: { params: Promise<{ id: s
   return (
     <div className="space-y-8">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm font-mono text-foreground/40">
-        <Link href="/test-groups" className="hover:text-accent transition-colors inline-flex items-center gap-1">
+      <div className="flex items-center gap-2 font-mono text-sm text-foreground/40">
+        <Link
+          href="/test-groups"
+          className="inline-flex items-center gap-1 transition-colors hover:text-accent"
+        >
           <ArrowLeft size={12} /> Test Groups
         </Link>
         <span>/</span>
         {run.test_group_id ? (
-          <Link href={`/test-groups/${run.test_group_id}`} className="hover:text-accent transition-colors">
+          <Link
+            href={`/test-groups/${run.test_group_id}`}
+            className="transition-colors hover:text-accent"
+          >
             {run.test_group_id.slice(0, 8)}
           </Link>
         ) : (
@@ -61,32 +84,42 @@ export default function GroupRunDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Header */}
-      <div className={`border p-6 space-y-4 ${isLive ? 'border-accent/70' : 'border-foreground/20'}`}>
+      <div
+        className={`space-y-4 border p-6 ${isLive ? 'border-accent/70' : 'border-foreground/20'}`}
+      >
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <p className="font-mono text-xs uppercase tracking-wider text-foreground/30">
                 Group Run
               </p>
-              <code className="font-mono text-xs text-foreground/40">{shortId(run.id)}</code>
+              <code className="font-mono text-xs text-foreground/40">
+                {shortId(run.id)}
+              </code>
               {isLive && (
-                <span className="inline-flex items-center gap-1.5 text-xs font-mono text-accent">
+                <span className="inline-flex items-center gap-1.5 font-mono text-xs text-accent">
                   <Loader2 size={11} className="animate-spin" />
                   Polling...
                 </span>
               )}
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant={groupRunStatusToBadge(run.status)}>{run.status}</Badge>
-              <span className="font-mono text-sm text-foreground/40">{run.browser}</span>
+              <Badge variant={groupRunStatusToBadge(run.status)}>
+                {run.status}
+              </Badge>
+              <span className="font-mono text-sm text-foreground/40">
+                {run.browser}
+              </span>
               <span className="font-mono text-sm text-foreground/40">
                 {run.viewport_width}×{run.viewport_height}
               </span>
             </div>
           </div>
-          <div className="text-right space-y-1">
+          <div className="space-y-1 text-right">
             <p className="font-mono text-xs text-foreground/30">Created</p>
-            <p className="font-mono text-sm">{formatDateTime(run.created_at)}</p>
+            <p className="font-mono text-sm">
+              {formatDateTime(run.created_at)}
+            </p>
           </div>
         </div>
       </div>
@@ -98,46 +131,62 @@ export default function GroupRunDetailPage({ params }: { params: Promise<{ id: s
           { label: 'Passed', value: passed, color: 'text-green-500' },
           { label: 'Failed', value: failed, color: 'text-red-500' },
         ].map((s, i) => (
-          <div key={s.label} className={`p-6 space-y-2 ${i < 2 ? 'border-r border-border' : ''}`}>
-            <p className="text-xs font-mono uppercase tracking-wider text-foreground/30">{s.label}</p>
-            <p className={`font-mono text-3xl font-bold ${s.color}`}>{s.value}</p>
+          <div
+            key={s.label}
+            className={`space-y-2 p-6 ${i < 2 ? 'border-r border-border' : ''}`}
+          >
+            <p className="font-mono text-xs uppercase tracking-wider text-foreground/30">
+              {s.label}
+            </p>
+            <p className={`font-mono text-3xl font-bold ${s.color}`}>
+              {s.value}
+            </p>
           </div>
         ))}
       </div>
 
       {/* Child Runs */}
       <div>
-        <p className="text-xs font-mono uppercase tracking-wider text-foreground/30 mb-4">
+        <p className="mb-4 font-mono text-xs uppercase tracking-wider text-foreground/30">
           Test Runs ({run.test_runs.length})
         </p>
         {run.test_runs.length === 0 ? (
           <div className="border-2 border-foreground/20 p-12 text-center">
-            <p className="font-mono text-sm text-foreground/40">No test runs yet.</p>
+            <p className="font-mono text-sm text-foreground/40">
+              No test runs yet.
+            </p>
           </div>
         ) : (
-          <div className="border border-foreground/20 space-y-0">
+          <div className="space-y-0 border border-foreground/20">
             {run.test_runs.map((tr, i) => (
               <div
                 key={tr.id}
-                className={`p-5 flex items-start justify-between gap-4 ${
+                className={`flex items-start justify-between gap-4 p-5 ${
                   i < run.test_runs.length - 1 ? 'border-b border-border' : ''
                 } hover:bg-foreground/[0.03]`}
               >
-                <div className="space-y-2 min-w-0 flex-1">
+                <div className="min-w-0 flex-1 space-y-2">
                   <div className="flex items-center gap-3">
-                    <Badge variant={runStatusToBadge(tr.status)}>{tr.status}</Badge>
-                    <code className="font-mono text-xs text-foreground/40">{tr.test_case_id ? shortId(tr.test_case_id) : '—'}</code>
+                    <Badge variant={runStatusToBadge(tr.status)}>
+                      {tr.status}
+                    </Badge>
+                    <code className="font-mono text-xs text-foreground/40">
+                      {tr.test_case_id ? shortId(tr.test_case_id) : '—'}
+                    </code>
                     <span className="font-mono text-xs text-foreground/30">
-                      {tr.step_results?.length ?? 0} step{(tr.step_results?.length ?? 0) !== 1 ? 's' : ''}
+                      {tr.step_results?.length ?? 0} step
+                      {(tr.step_results?.length ?? 0) !== 1 ? 's' : ''}
                     </span>
                   </div>
                   {tr.error && (
-                    <p className="font-mono text-xs text-red-400 truncate">{tr.error}</p>
+                    <p className="truncate font-mono text-xs text-red-400">
+                      {tr.error}
+                    </p>
                   )}
                 </div>
                 <Link
                   href={`/runs/${tr.id}`}
-                  className="inline-flex items-center gap-1 text-xs font-mono text-foreground/30 hover:text-accent transition-colors flex-shrink-0"
+                  className="inline-flex flex-shrink-0 items-center gap-1 font-mono text-xs text-foreground/30 transition-colors hover:text-accent"
                 >
                   View <ArrowRight size={11} />
                 </Link>

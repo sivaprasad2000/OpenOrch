@@ -32,13 +32,17 @@ export default function SettingsPage() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { loadUser() }, [])
+  useEffect(() => {
+    loadUser()
+  }, [])
 
   async function handleSwitchOrg(orgId: string) {
     try {
       await userService.setActiveOrganization(orgId)
       loadUser()
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   async function handleCreateOrg(e: React.FormEvent) {
@@ -48,13 +52,17 @@ export default function SettingsPage() {
     setOrgError('')
     setOrgSuccess('')
     try {
-      const org = await userService.createOrganization({ name: newOrgName.trim() })
+      const org = await userService.createOrganization({
+        name: newOrgName.trim(),
+      })
       await userService.setActiveOrganization(org.id)
       setNewOrgName('')
       setOrgSuccess(`Organization "${org.name}" created and set as active.`)
       loadUser()
     } catch (err) {
-      setOrgError(err instanceof Error ? err.message : 'Failed to create organization')
+      setOrgError(
+        err instanceof Error ? err.message : 'Failed to create organization'
+      )
     } finally {
       setCreatingOrg(false)
     }
@@ -66,46 +74,72 @@ export default function SettingsPage() {
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><Spinner size="lg" /></div>
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="max-w-2xl space-y-8">
       <div>
-        <h1 className="font-mono text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="font-mono text-sm text-foreground/40 mt-1">Manage your account and workspace</p>
+        <h1 className="font-mono text-3xl font-bold tracking-tight">
+          Settings
+        </h1>
+        <p className="mt-1 font-mono text-sm text-foreground/40">
+          Manage your account and workspace
+        </p>
       </div>
 
       {/* Profile */}
-      <section className="border border-foreground/20 p-6 space-y-5">
-        <p className="text-xs font-mono uppercase tracking-wider text-foreground/30">Profile</p>
+      <section className="space-y-5 border border-foreground/20 p-6">
+        <p className="font-mono text-xs uppercase tracking-wider text-foreground/30">
+          Profile
+        </p>
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <label className="block font-mono text-sm text-foreground/70">Name</label>
+            <label className="block font-mono text-sm text-foreground/70">
+              Name
+            </label>
             <input
               value={user?.name ?? ''}
               readOnly
-              className={INPUT_CLS + ' opacity-60 cursor-not-allowed'}
+              className={INPUT_CLS + ' cursor-not-allowed opacity-60'}
             />
           </div>
           <div className="space-y-1.5">
-            <label className="block font-mono text-sm text-foreground/70">Email</label>
+            <label className="block font-mono text-sm text-foreground/70">
+              Email
+            </label>
             <div className="flex items-center gap-3">
               <input
                 value={user?.email ?? ''}
                 readOnly
-                className={INPUT_CLS + ' opacity-60 cursor-not-allowed flex-1'}
+                className={INPUT_CLS + ' flex-1 cursor-not-allowed opacity-60'}
               />
-              <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="flex flex-shrink-0 items-center gap-1.5">
                 {user?.is_verified ? (
                   <>
-                    <CheckCircle size={14} strokeWidth={1.5} className="text-green-500" />
-                    <span className="font-mono text-xs text-green-500">verified</span>
+                    <CheckCircle
+                      size={14}
+                      strokeWidth={1.5}
+                      className="text-green-500"
+                    />
+                    <span className="font-mono text-xs text-green-500">
+                      verified
+                    </span>
                   </>
                 ) : (
                   <>
-                    <Circle size={14} strokeWidth={1.5} className="text-foreground/30" />
-                    <span className="font-mono text-xs text-foreground/40">unverified</span>
+                    <Circle
+                      size={14}
+                      strokeWidth={1.5}
+                      className="text-foreground/30"
+                    />
+                    <span className="font-mono text-xs text-foreground/40">
+                      unverified
+                    </span>
                   </>
                 )}
               </div>
@@ -115,12 +149,16 @@ export default function SettingsPage() {
       </section>
 
       {/* Organization */}
-      <section className="border border-foreground/20 p-6 space-y-5">
-        <p className="text-xs font-mono uppercase tracking-wider text-foreground/30">Organization</p>
+      <section className="space-y-5 border border-foreground/20 p-6">
+        <p className="font-mono text-xs uppercase tracking-wider text-foreground/30">
+          Organization
+        </p>
 
         {user?.organizations && user.organizations.length > 1 && (
           <div className="space-y-2">
-            <p className="font-mono text-sm text-foreground/60">Switch organization</p>
+            <p className="font-mono text-sm text-foreground/60">
+              Switch organization
+            </p>
             <div className="space-y-2">
               {user.organizations.map((org) => {
                 const isActive = org.id === user.active_organization?.id
@@ -129,9 +167,9 @@ export default function SettingsPage() {
                     key={org.id}
                     onClick={() => !isActive && handleSwitchOrg(org.id)}
                     disabled={isActive}
-                    className={`w-full flex items-center justify-between px-4 py-3 border-2 font-mono text-sm transition-colors text-left ${
+                    className={`flex w-full items-center justify-between border-2 px-4 py-3 text-left font-mono text-sm transition-colors ${
                       isActive
-                        ? 'border-accent text-foreground cursor-default'
+                        ? 'cursor-default border-accent text-foreground'
                         : 'border-foreground/20 text-foreground/60 hover:border-foreground/40 hover:text-foreground'
                     }`}
                   >
@@ -146,17 +184,22 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {!user?.organizations || user.organizations.length <= 1 && (
-          <div className="space-y-1">
-            <p className="font-mono text-sm text-foreground/60">Current organization</p>
-            <p className="font-mono text-foreground">
-              {user?.active_organization?.name ?? '—'}
-            </p>
-          </div>
-        )}
+        {!user?.organizations ||
+          (user.organizations.length <= 1 && (
+            <div className="space-y-1">
+              <p className="font-mono text-sm text-foreground/60">
+                Current organization
+              </p>
+              <p className="font-mono text-foreground">
+                {user?.active_organization?.name ?? '—'}
+              </p>
+            </div>
+          ))}
 
-        <div className="border-t border-border pt-5 space-y-3">
-          <p className="font-mono text-sm text-foreground/60">Create new organization</p>
+        <div className="space-y-3 border-t border-border pt-5">
+          <p className="font-mono text-sm text-foreground/60">
+            Create new organization
+          </p>
           <form onSubmit={handleCreateOrg} className="flex gap-3">
             <input
               placeholder="Organization name"
@@ -164,17 +207,21 @@ export default function SettingsPage() {
               onChange={(e) => setNewOrgName(e.target.value)}
               className={INPUT_CLS + ' flex-1'}
             />
-            <button type="submit" disabled={creatingOrg || !newOrgName.trim()} className={SEC_BTN}>
+            <button
+              type="submit"
+              disabled={creatingOrg || !newOrgName.trim()}
+              className={SEC_BTN}
+            >
               {creatingOrg ? 'Creating...' : 'Create'}
             </button>
           </form>
           {orgError && (
-            <div className="p-3 border-2 border-red-500 bg-red-500/10">
+            <div className="border-2 border-red-500 bg-red-500/10 p-3">
               <p className="font-mono text-sm text-red-500">{orgError}</p>
             </div>
           )}
           {orgSuccess && (
-            <div className="p-3 border-2 border-accent bg-accent/10">
+            <div className="border-2 border-accent bg-accent/10 p-3">
               <p className="font-mono text-sm text-accent">{orgSuccess}</p>
             </div>
           )}
@@ -182,17 +229,17 @@ export default function SettingsPage() {
       </section>
 
       {/* Sign out */}
-      <section className="border border-foreground/20 p-6 space-y-4">
+      <section className="space-y-4 border border-foreground/20 p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="font-mono text-sm">Sign out</p>
-            <p className="font-mono text-xs text-foreground/40 mt-0.5">
+            <p className="mt-0.5 font-mono text-xs text-foreground/40">
               You will be redirected to the login page.
             </p>
           </div>
           <button
             onClick={handleLogout}
-            className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-red-500/50 text-red-400 font-mono text-sm hover:bg-red-500/10 transition-colors"
+            className="inline-flex items-center gap-2 border-2 border-red-500/50 px-5 py-2.5 font-mono text-sm text-red-400 transition-colors hover:bg-red-500/10"
           >
             <LogOut size={14} strokeWidth={1.5} />
             Sign out

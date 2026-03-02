@@ -23,7 +23,9 @@ export const llmService = {
   },
 
   setActive(orgId: string, llmId: string): Promise<OrganizationResponse> {
-    return apiPut(`/api/v1/organizations/${orgId}/active-llm`, { llm_id: llmId })
+    return apiPut(`/api/v1/organizations/${orgId}/active-llm`, {
+      llm_id: llmId,
+    })
   },
 
   unsetActive(orgId: string): Promise<void> {

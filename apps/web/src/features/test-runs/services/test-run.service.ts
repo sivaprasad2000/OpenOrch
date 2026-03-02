@@ -1,5 +1,9 @@
 import { apiGet } from '@/lib/api-client'
-import type { TestRunResponse, TestGroupRunResponse, PlayerRunResponse } from '../types'
+import type {
+  TestRunResponse,
+  TestGroupRunResponse,
+  PlayerRunResponse,
+} from '../types'
 
 export const testRunService = {
   getRun(id: string): Promise<TestRunResponse> {

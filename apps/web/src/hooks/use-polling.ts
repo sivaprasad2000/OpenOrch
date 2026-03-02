@@ -51,7 +51,7 @@ export function usePolling<T>(
         intervalRef.current = null
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [intervalMs])
 
   return { data, loading, error }

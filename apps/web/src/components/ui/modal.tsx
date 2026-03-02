@@ -12,7 +12,13 @@ interface ModalProps {
   className?: string
 }
 
-export function Modal({ open, onClose, title, children, className }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  className,
+}: ModalProps) {
   useEffect(() => {
     if (!open) return
     const prev = document.body.style.overflow
@@ -42,20 +48,20 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       />
       <div
         className={cn(
-          'relative z-10 w-full max-w-lg mx-4 brutalist-border bg-background p-6',
+          'brutalist-border relative z-10 mx-4 w-full max-w-lg bg-background p-6',
           className
         )}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        <div className="flex items-center justify-between mb-6">
-          <h2 id="modal-title" className="text-lg font-bold font-mono">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 id="modal-title" className="font-mono text-lg font-bold">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="text-foreground/30 hover:text-foreground transition-colors"
+            className="text-foreground/30 transition-colors hover:text-foreground"
             aria-label="Close"
           >
             <X size={16} strokeWidth={1.5} />

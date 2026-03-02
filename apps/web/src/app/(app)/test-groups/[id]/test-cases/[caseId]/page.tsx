@@ -3,9 +3,19 @@
 import { use, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react'
+import {
+  ArrowLeft,
+  ChevronDown,
+  ChevronRight,
+  Plus,
+  Trash2,
+} from 'lucide-react'
 import { testCaseService } from '@/features/test-cases/services/test-case.service'
-import type { StepGroup, TestCaseStep, TestCasePayload } from '@/features/test-cases/types'
+import type {
+  StepGroup,
+  TestCaseStep,
+  TestCasePayload,
+} from '@/features/test-cases/types'
 import { Spinner } from '@/components/ui/spinner'
 import {
   StepBuilder,
@@ -32,7 +42,9 @@ interface GroupDraft {
 }
 
 let _groupCounter = 0
-function nextGroupId() { return `group-${++_groupCounter}` }
+function nextGroupId() {
+  return `group-${++_groupCounter}`
+}
 
 function emptyGroup(name = '', steps?: StepDraft[]): GroupDraft {
   return {
@@ -75,11 +87,13 @@ function parseGroups(payload: TestCasePayload): GroupDraft[] {
 
 function toApiPayload(groups: GroupDraft[]): TestCasePayload {
   return {
-    steps: groups.map((g): StepGroup => ({
-      type: 'group',
-      name: g.name,
-      steps: g.steps.map((draft) => buildStep(draft) as TestCaseStep),
-    })),
+    steps: groups.map(
+      (g): StepGroup => ({
+        type: 'group',
+        name: g.name,
+        steps: g.steps.map((draft) => buildStep(draft) as TestCaseStep),
+      })
+    ),
   }
 }
 
@@ -103,17 +117,18 @@ function GroupCard({
   return (
     <div className="border border-foreground/20">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-foreground/[0.02]">
+      <div className="flex items-center gap-3 bg-foreground/[0.02] px-4 py-3">
         <button
           type="button"
           onClick={() => onChange({ ...group, collapsed: !group.collapsed })}
-          className="text-foreground/40 hover:text-foreground transition-colors flex-shrink-0"
+          className="flex-shrink-0 text-foreground/40 transition-colors hover:text-foreground"
           title={group.collapsed ? 'Expand' : 'Collapse'}
         >
-          {group.collapsed
-            ? <ChevronRight size={14} strokeWidth={1.5} />
-            : <ChevronDown size={14} strokeWidth={1.5} />
-          }
+          {group.collapsed ? (
+            <ChevronRight size={14} strokeWidth={1.5} />
+          ) : (
+            <ChevronDown size={14} strokeWidth={1.5} />
+          )}
         </button>
 
         <input
@@ -121,11 +136,11 @@ function GroupCard({
           value={group.name}
           onChange={(e) => onChange({ ...group, name: e.target.value })}
           placeholder="Group name..."
-          className="flex-1 bg-transparent font-mono text-sm font-semibold text-foreground placeholder:text-foreground/30 focus:outline-none focus-visible:ring-0 min-w-0"
+          className="min-w-0 flex-1 bg-transparent font-mono text-sm font-semibold text-foreground placeholder:text-foreground/30 focus:outline-none focus-visible:ring-0"
         />
 
         {group.collapsed && (
-          <span className="font-mono text-xs text-foreground/30 flex-shrink-0">
+          <span className="flex-shrink-0 font-mono text-xs text-foreground/30">
             {stepCount} step{stepCount !== 1 ? 's' : ''}
           </span>
         )}
@@ -134,7 +149,7 @@ function GroupCard({
           type="button"
           onClick={onRemove}
           disabled={isOnly}
-          className="text-foreground/20 hover:text-red-400 transition-colors disabled:opacity-20 disabled:cursor-not-allowed flex-shrink-0"
+          className="flex-shrink-0 text-foreground/20 transition-colors hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-20"
           title="Remove group"
         >
           <Trash2 size={14} strokeWidth={1.5} />
@@ -143,7 +158,7 @@ function GroupCard({
 
       {/* Body */}
       {!group.collapsed && (
-        <div className="p-4 border-t border-border">
+        <div className="border-t border-border p-4">
           <StepBuilder
             steps={group.steps}
             actions={actions}
@@ -174,21 +189,30 @@ export default function TestCaseBuilderPage({
 
   // Fetch available step actions from the API
   useEffect(() => {
-    testCaseService.getStepActions().then(setStepActions).catch(() => {})
+    testCaseService
+      .getStepActions()
+      .then(setStepActions)
+      .catch(() => {})
   }, [])
 
   useEffect(() => {
     if (isNew) return
     let cancelled = false
-    testCaseService.get(groupId, caseId)
+    testCaseService
+      .get(groupId, caseId)
       .then((tc) => {
         if (!cancelled && tc?.payload) setGroups(parseGroups(tc.payload))
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load')
+        if (!cancelled)
+          setError(err instanceof Error ? err.message : 'Failed to load')
       })
-      .finally(() => { if (!cancelled) setLoading(false) })
-    return () => { cancelled = true }
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [groupId, caseId, isNew])
 
   function addGroup() {
@@ -200,7 +224,11 @@ export default function TestCaseBuilderPage({
   }
 
   function updateGroup(i: number, updated: GroupDraft) {
-    setGroups((g) => { const n = [...g]; n[i] = updated; return n })
+    setGroups((g) => {
+      const n = [...g]
+      n[i] = updated
+      return n
+    })
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -215,7 +243,9 @@ export default function TestCaseBuilderPage({
     for (let gi = 0; gi < groups.length; gi++) {
       const emptyStep = groups[gi].steps.findIndex((s) => !s.action)
       if (emptyStep !== -1) {
-        setError(`"${groups[gi].name}": step ${emptyStep + 1} — please select an action.`)
+        setError(
+          `"${groups[gi].name}": step ${emptyStep + 1} — please select an action.`
+        )
         return
       }
     }
@@ -239,22 +269,34 @@ export default function TestCaseBuilderPage({
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><Spinner size="lg" /></div>
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-8 max-w-3xl">
+    <div className="max-w-3xl space-y-8">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm font-mono text-foreground/40">
-        <Link href="/test-groups" className="hover:text-accent transition-colors inline-flex items-center gap-1">
+      <div className="flex items-center gap-2 font-mono text-sm text-foreground/40">
+        <Link
+          href="/test-groups"
+          className="inline-flex items-center gap-1 transition-colors hover:text-accent"
+        >
           <ArrowLeft size={12} /> Test Groups
         </Link>
         <span>/</span>
-        <Link href={`/test-groups/${groupId}`} className="hover:text-accent transition-colors">
+        <Link
+          href={`/test-groups/${groupId}`}
+          className="transition-colors hover:text-accent"
+        >
           Group
         </Link>
         <span>/</span>
-        <span className="text-foreground">{isNew ? 'New Test Case' : 'Edit Test Case'}</span>
+        <span className="text-foreground">
+          {isNew ? 'New Test Case' : 'Edit Test Case'}
+        </span>
       </div>
 
       {/* Title */}
@@ -262,8 +304,9 @@ export default function TestCaseBuilderPage({
         <h1 className="font-mono text-3xl font-bold tracking-tight">
           {isNew ? 'New Test Case' : 'Edit Test Case'}
         </h1>
-        <p className="font-mono text-sm text-foreground/40 mt-1">
-          Organise steps into named groups. Each step has an action type and a plain-English description for the LLM.
+        <p className="mt-1 font-mono text-sm text-foreground/40">
+          Organise steps into named groups. Each step has an action type and a
+          plain-English description for the LLM.
         </p>
       </div>
 
@@ -286,19 +329,19 @@ export default function TestCaseBuilderPage({
         <button
           type="button"
           onClick={addGroup}
-          className="w-full border border-dashed border-foreground/20 py-3 font-mono text-sm text-foreground/30 hover:border-accent hover:text-accent transition-colors inline-flex items-center justify-center gap-2"
+          className="inline-flex w-full items-center justify-center gap-2 border border-dashed border-foreground/20 py-3 font-mono text-sm text-foreground/30 transition-colors hover:border-accent hover:text-accent"
         >
           <Plus size={14} strokeWidth={1.5} />
           Add group
         </button>
 
         {error && (
-          <div className="p-3 border-2 border-red-500 bg-red-500/10">
+          <div className="border-2 border-red-500 bg-red-500/10 p-3">
             <p className="font-mono text-sm text-red-500">{error}</p>
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-2 border-t border-border">
+        <div className="flex items-center justify-between border-t border-border pt-2">
           <Link href={`/test-groups/${groupId}`} className={SEC_BTN}>
             Cancel
           </Link>

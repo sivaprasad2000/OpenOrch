@@ -22,7 +22,7 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Modal open={open} onClose={onClose} title={title}>
-      <p className="font-mono text-sm text-foreground/70 mb-6">{description}</p>
+      <p className="mb-6 font-mono text-sm text-foreground/70">{description}</p>
       <div className="flex items-center justify-end gap-3">
         <Button variant="secondary" size="sm" onClick={onClose}>
           Cancel
@@ -30,7 +30,7 @@ export function ConfirmDialog({
         {dangerous ? (
           <button
             onClick={onConfirm}
-            className="inline-flex items-center justify-center font-medium transition-all h-9 px-4 text-sm border-2 border-red-500 text-red-500 bg-red-500/10 hover:bg-red-500/20"
+            className="inline-flex h-9 items-center justify-center border-2 border-red-500 bg-red-500/10 px-4 text-sm font-medium text-red-500 transition-all hover:bg-red-500/20"
           >
             {confirmLabel}
           </button>

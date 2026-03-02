@@ -4,7 +4,11 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Plus, Play, Archive, Trash2, ArrowRight } from 'lucide-react'
 import { testGroupService } from '@/features/test-groups/services/test-group.service'
-import type { TestGroupResponse, RunConfig, RunBrowser } from '@/features/test-groups/types'
+import type {
+  TestGroupResponse,
+  RunConfig,
+  RunBrowser,
+} from '@/features/test-groups/types'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -53,7 +57,9 @@ export default function TestGroupsPage() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { loadGroups() }, [])
+  useEffect(() => {
+    loadGroups()
+  }, [])
 
   const filtered = groups.filter((g) => {
     const matchSearch = g.name.toLowerCase().includes(search.toLowerCase())
@@ -71,10 +77,18 @@ export default function TestGroupsPage() {
         name: createName.trim(),
         description: createDesc.trim() || undefined,
         base_url: createUrl.trim() || undefined,
-        tags: createTags ? createTags.split(',').map((t) => t.trim()).filter(Boolean) : [],
+        tags: createTags
+          ? createTags
+              .split(',')
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : [],
       })
       setCreateOpen(false)
-      setCreateName(''); setCreateDesc(''); setCreateUrl(''); setCreateTags('')
+      setCreateName('')
+      setCreateDesc('')
+      setCreateUrl('')
+      setCreateTags('')
       loadGroups()
     } catch (err) {
       setCreateError(err instanceof Error ? err.message : 'Failed to create')
@@ -111,7 +125,9 @@ export default function TestGroupsPage() {
         status: currentStatus === 'active' ? 'archived' : 'active',
       })
       loadGroups()
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   async function handleDelete() {
@@ -120,11 +136,17 @@ export default function TestGroupsPage() {
       await testGroupService.delete(deleteId)
       setDeleteId(null)
       loadGroups()
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><Spinner size="lg" /></div>
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
   return (
@@ -132,14 +154,16 @@ export default function TestGroupsPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="font-mono text-3xl font-bold tracking-tight">Test Groups</h1>
-          <p className="font-mono text-sm text-foreground/40 mt-1">
+          <h1 className="font-mono text-3xl font-bold tracking-tight">
+            Test Groups
+          </h1>
+          <p className="mt-1 font-mono text-sm text-foreground/40">
             {groups.length} group{groups.length !== 1 ? 's' : ''}
           </p>
         </div>
         <button
           onClick={() => setCreateOpen(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-black font-mono text-sm font-semibold hover:bg-accent/90 transition-colors"
+          className="inline-flex items-center gap-2 bg-accent px-5 py-2.5 font-mono text-sm font-semibold text-black transition-colors hover:bg-accent/90"
         >
           <Plus size={14} strokeWidth={2} />
           New Test Group
@@ -147,19 +171,19 @@ export default function TestGroupsPage() {
       </div>
 
       {error && (
-        <div className="p-3 border-2 border-red-500 bg-red-500/10">
+        <div className="border-2 border-red-500 bg-red-500/10 p-3">
           <p className="font-mono text-sm text-red-500">{error}</p>
         </div>
       )}
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <input
           type="text"
           placeholder="Search groups..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 px-4 py-2.5 bg-background border-2 border-foreground/20 text-foreground placeholder:text-foreground/30 font-mono text-sm focus:outline-none focus:border-accent transition-colors"
+          className="flex-1 border-2 border-foreground/20 bg-background px-4 py-2.5 font-mono text-sm text-foreground transition-colors placeholder:text-foreground/30 focus:border-accent focus:outline-none"
         />
         <div className="flex border-2 border-foreground/20">
           {(['all', 'active', 'archived'] as StatusFilter[]).map((s) => (
@@ -168,7 +192,7 @@ export default function TestGroupsPage() {
               onClick={() => setStatusFilter(s)}
               className={`px-4 py-2.5 font-mono text-sm capitalize transition-colors ${
                 statusFilter === s
-                  ? 'bg-accent text-black font-semibold'
+                  ? 'bg-accent font-semibold text-black'
                   : 'text-foreground/50 hover:text-foreground'
               } ${s !== 'all' ? 'border-l border-foreground/20' : ''}`}
             >
@@ -191,7 +215,7 @@ export default function TestGroupsPage() {
             !search && statusFilter === 'all' ? (
               <button
                 onClick={() => setCreateOpen(true)}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-black font-mono text-sm font-semibold hover:bg-accent/90 transition-colors"
+                className="inline-flex items-center gap-2 bg-accent px-5 py-2.5 font-mono text-sm font-semibold text-black transition-colors hover:bg-accent/90"
               >
                 <Plus size={14} strokeWidth={2} />
                 New Test Group
@@ -200,30 +224,36 @@ export default function TestGroupsPage() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((group) => (
-            <div key={group.id} className="border border-foreground/20 p-5 space-y-4 flex flex-col">
+            <div
+              key={group.id}
+              className="flex flex-col space-y-4 border border-foreground/20 p-5"
+            >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <Link
                     href={`/test-groups/${group.id}`}
-                    className="font-mono font-semibold hover:text-accent transition-colors truncate block"
+                    className="block truncate font-mono font-semibold transition-colors hover:text-accent"
                   >
                     {group.name}
                   </Link>
                   {group.base_url && (
-                    <p className="font-mono text-xs text-foreground/40 truncate mt-0.5">
+                    <p className="mt-0.5 truncate font-mono text-xs text-foreground/40">
                       {group.base_url}
                     </p>
                   )}
                 </div>
-                <Badge variant={testGroupStatusToBadge(group.status)} className="flex-shrink-0">
+                <Badge
+                  variant={testGroupStatusToBadge(group.status)}
+                  className="flex-shrink-0"
+                >
                   {group.status}
                 </Badge>
               </div>
 
               {group.description && (
-                <p className="font-mono text-sm text-foreground/60 line-clamp-2">
+                <p className="line-clamp-2 font-mono text-sm text-foreground/60">
                   {group.description}
                 </p>
               )}
@@ -233,7 +263,7 @@ export default function TestGroupsPage() {
                   {group.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="border border-foreground/20 text-foreground/40 font-mono text-xs px-2 py-0.5"
+                      className="border border-foreground/20 px-2 py-0.5 font-mono text-xs text-foreground/40"
                     >
                       {tag}
                     </span>
@@ -241,31 +271,34 @@ export default function TestGroupsPage() {
                 </div>
               )}
 
-              <div className="flex items-center gap-2 pt-1 mt-auto border-t border-border">
+              <div className="mt-auto flex items-center gap-2 border-t border-border pt-1">
                 <button
-                  onClick={() => { setRunGroupId(group.id); setRunError('') }}
-                  className="inline-flex items-center gap-1.5 text-xs font-mono text-foreground/50 hover:text-accent transition-colors"
+                  onClick={() => {
+                    setRunGroupId(group.id)
+                    setRunError('')
+                  }}
+                  className="inline-flex items-center gap-1.5 font-mono text-xs text-foreground/50 transition-colors hover:text-accent"
                 >
                   <Play size={11} strokeWidth={2} />
                   Run
                 </button>
                 <button
                   onClick={() => handleArchive(group.id, group.status)}
-                  className="inline-flex items-center gap-1.5 text-xs font-mono text-foreground/50 hover:text-foreground transition-colors"
+                  className="inline-flex items-center gap-1.5 font-mono text-xs text-foreground/50 transition-colors hover:text-foreground"
                 >
                   <Archive size={11} strokeWidth={1.5} />
                   {group.status === 'active' ? 'Archive' : 'Restore'}
                 </button>
                 <button
                   onClick={() => setDeleteId(group.id)}
-                  className="inline-flex items-center gap-1.5 text-xs font-mono text-foreground/50 hover:text-red-400 transition-colors"
+                  className="inline-flex items-center gap-1.5 font-mono text-xs text-foreground/50 transition-colors hover:text-red-400"
                 >
                   <Trash2 size={11} strokeWidth={1.5} />
                   Delete
                 </button>
                 <Link
                   href={`/test-groups/${group.id}`}
-                  className="ml-auto inline-flex items-center gap-1 text-xs font-mono text-foreground/30 hover:text-accent transition-colors"
+                  className="ml-auto inline-flex items-center gap-1 font-mono text-xs text-foreground/30 transition-colors hover:text-accent"
                 >
                   Details <ArrowRight size={11} />
                 </Link>
@@ -276,7 +309,11 @@ export default function TestGroupsPage() {
       )}
 
       {/* Create Modal */}
-      <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="New Test Group">
+      <Modal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        title="New Test Group"
+      >
         <form onSubmit={handleCreate} className="space-y-5">
           <FieldRow label="Name *">
             <input
@@ -316,7 +353,11 @@ export default function TestGroupsPage() {
           </FieldRow>
           {createError && <ErrBox msg={createError} />}
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setCreateOpen(false)} className={SEC_BTN}>
+            <button
+              type="button"
+              onClick={() => setCreateOpen(false)}
+              className={SEC_BTN}
+            >
               Cancel
             </button>
             <button type="submit" disabled={createLoading} className={PRI_BTN}>
@@ -373,7 +414,11 @@ export default function TestGroupsPage() {
           </FieldRow>
           {runError && <ErrBox msg={runError} />}
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setRunGroupId(null)} className={SEC_BTN}>
+            <button
+              type="button"
+              onClick={() => setRunGroupId(null)}
+              className={SEC_BTN}
+            >
               Cancel
             </button>
             <button type="submit" disabled={runLoading} className={PRI_BTN}>
@@ -397,10 +442,18 @@ export default function TestGroupsPage() {
   )
 }
 
-function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+function FieldRow({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}) {
   return (
     <div className="space-y-1.5">
-      <label className="block font-mono text-sm text-foreground/70">{label}</label>
+      <label className="block font-mono text-sm text-foreground/70">
+        {label}
+      </label>
       {children}
     </div>
   )
@@ -408,7 +461,7 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
 
 function ErrBox({ msg }: { msg: string }) {
   return (
-    <div className="p-3 border-2 border-red-500 bg-red-500/10">
+    <div className="border-2 border-red-500 bg-red-500/10 p-3">
       <p className="font-mono text-sm text-red-500">{msg}</p>
     </div>
   )

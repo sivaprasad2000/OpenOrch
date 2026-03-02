@@ -42,8 +42,8 @@ function NavLink({
       href={href}
       className={`flex items-center gap-3 px-3 py-2.5 font-mono text-sm transition-colors ${
         isActive
-          ? 'text-accent border-l-2 border-accent pl-[10px]'
-          : 'text-foreground/50 hover:text-foreground border-l-2 border-transparent pl-[10px]'
+          ? 'border-l-2 border-accent pl-[10px] text-accent'
+          : 'border-l-2 border-transparent pl-[10px] text-foreground/50 hover:text-foreground'
       }`}
     >
       <Icon size={15} strokeWidth={1.5} />
@@ -86,45 +86,45 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <Spinner size="lg" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-60 border-r border-border flex flex-col flex-shrink-0">
-        <div className="p-6 border-b border-border">
+      <aside className="flex w-60 flex-shrink-0 flex-col border-r border-border">
+        <div className="border-b border-border p-6">
           <Link
             href="/dashboard"
-            className="font-mono text-xl font-bold tracking-tight hover:text-accent transition-colors"
+            className="font-mono text-xl font-bold tracking-tight transition-colors hover:text-accent"
           >
             OpenOrch
           </Link>
         </div>
 
-        <nav className="flex-1 p-4 space-y-0.5">
+        <nav className="flex-1 space-y-0.5 p-4">
           {NAV_ITEMS.map((item) => (
             <NavLink key={item.href} {...item} />
           ))}
         </nav>
 
-        <div className="p-4 border-t border-border space-y-3">
+        <div className="space-y-3 border-t border-border p-4">
           {user && (
             <div className="space-y-0.5">
-              <p className="text-xs font-mono uppercase tracking-wider text-foreground/30">
+              <p className="font-mono text-xs uppercase tracking-wider text-foreground/30">
                 {user.active_organization?.name ?? 'No org'}
               </p>
-              <p className="text-xs font-mono text-foreground/50 truncate">
+              <p className="truncate font-mono text-xs text-foreground/50">
                 {user.email}
               </p>
             </div>
           )}
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 text-xs font-mono text-foreground/40 hover:text-red-400 transition-colors"
+            className="flex items-center gap-2 font-mono text-xs text-foreground/40 transition-colors hover:text-red-400"
           >
             <LogOut size={12} strokeWidth={1.5} />
             Sign out
@@ -133,20 +133,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex min-w-0 flex-1 flex-col">
         {/* Top Bar */}
-        <header className="border-b border-border h-14 flex items-center px-6 flex-shrink-0">
+        <header className="flex h-14 flex-shrink-0 items-center border-b border-border px-6">
           <div className="flex-1" />
           <button
             onClick={() => router.push('/settings')}
-            className="font-mono text-sm text-foreground/50 hover:text-foreground transition-colors"
+            className="font-mono text-sm text-foreground/50 transition-colors hover:text-foreground"
           >
             {user?.name ?? 'Profile'}
           </button>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-8 overflow-auto">
+        <main className="flex-1 overflow-auto p-8">
           <Container size="full">{children}</Container>
         </main>
       </div>

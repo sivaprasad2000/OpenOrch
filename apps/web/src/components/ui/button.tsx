@@ -1,5 +1,10 @@
 import { cn } from '@/lib/utils'
-import { ButtonHTMLAttributes, forwardRef, ReactElement, cloneElement } from 'react'
+import {
+  ButtonHTMLAttributes,
+  forwardRef,
+  ReactElement,
+  cloneElement,
+} from 'react'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost'
@@ -8,7 +13,17 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', asChild, children, ...props }, ref) => {
+  (
+    {
+      className,
+      variant = 'primary',
+      size = 'md',
+      asChild,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const classes = cn(
       'inline-flex items-center justify-center font-medium transition-all',
       'disabled:pointer-events-none disabled:opacity-50',
@@ -35,11 +50,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     return (
-      <button
-        ref={ref}
-        className={classes}
-        {...props}
-      >
+      <button ref={ref} className={classes} {...props}>
         {children}
       </button>
     )

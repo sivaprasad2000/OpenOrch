@@ -7,14 +7,14 @@ export function Header() {
     <header className="border-b border-border py-4">
       <Container>
         <nav className="flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold font-mono">
+          <Link href="/" className="font-mono text-xl font-bold">
             OpenOrch
           </Link>
 
           <div className="flex items-center gap-4">
             <Link
               href="/login"
-              className="text-sm text-muted hover:text-foreground transition-colors"
+              className="text-sm text-muted transition-colors hover:text-foreground"
             >
               Login
             </Link>

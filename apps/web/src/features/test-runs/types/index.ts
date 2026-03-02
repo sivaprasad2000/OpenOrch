@@ -15,10 +15,19 @@ export interface PlayerRunResponse {
   recording_url: string | null
   markers: StepMarker[]
 }
-export type GroupRunStatus = 'queued' | 'running' | 'passed' | 'failed' | 'partial'
+export type GroupRunStatus =
+  | 'queued'
+  | 'running'
+  | 'passed'
+  | 'failed'
+  | 'partial'
 
 export const TERMINAL_RUN_STATUSES: RunStatus[] = ['passed', 'failed']
-export const TERMINAL_GROUP_STATUSES: GroupRunStatus[] = ['passed', 'failed', 'partial']
+export const TERMINAL_GROUP_STATUSES: GroupRunStatus[] = [
+  'passed',
+  'failed',
+  'partial',
+]
 
 export interface StepResult {
   index: number

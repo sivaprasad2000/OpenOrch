@@ -18,7 +18,8 @@ export default function LoginPage() {
 
     const form = e.currentTarget
     const email = (form.elements.namedItem('email') as HTMLInputElement).value
-    const password = (form.elements.namedItem('password') as HTMLInputElement).value
+    const password = (form.elements.namedItem('password') as HTMLInputElement)
+      .value
 
     try {
       const data = await authService.signin({ email, password })
@@ -32,18 +33,18 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-24">
-      <div className="max-w-md w-full space-y-12">
+    <div className="flex min-h-screen items-center justify-center px-6 py-24">
+      <div className="w-full max-w-md space-y-12">
         {/* Back Link */}
         <Link
           href="/"
-          className="inline-flex items-center gap-2 font-mono text-sm text-foreground/60 hover:text-accent transition-colors"
+          className="inline-flex items-center gap-2 font-mono text-sm text-foreground/60 transition-colors hover:text-accent"
         >
           ← Back to home
         </Link>
 
         {/* Logo/Brand */}
-        <Link href="/" className="block hover:text-accent transition-colors">
+        <Link href="/" className="block transition-colors hover:text-accent">
           <h1 className="font-mono text-6xl tracking-tight">OpenOrch</h1>
         </Link>
 
@@ -67,7 +68,7 @@ export default function LoginPage() {
               type="email"
               required
               placeholder="you@example.com"
-              className="w-full px-4 py-3 bg-background border-2 border-foreground/20 text-foreground placeholder:text-foreground/40 font-mono focus:outline-none focus:border-accent transition-colors"
+              className="w-full border-2 border-foreground/20 bg-background px-4 py-3 font-mono text-foreground transition-colors placeholder:text-foreground/40 focus:border-accent focus:outline-none"
             />
           </div>
 
@@ -81,12 +82,12 @@ export default function LoginPage() {
               type="password"
               required
               placeholder="••••••••"
-              className="w-full px-4 py-3 bg-background border-2 border-foreground/20 text-foreground placeholder:text-foreground/40 font-mono focus:outline-none focus:border-accent transition-colors"
+              className="w-full border-2 border-foreground/20 bg-background px-4 py-3 font-mono text-foreground transition-colors placeholder:text-foreground/40 focus:border-accent focus:outline-none"
             />
           </div>
 
           {error && (
-            <div className="p-3 border-2 border-red-500 bg-red-500/10">
+            <div className="border-2 border-red-500 bg-red-500/10 p-3">
               <p className="font-mono text-sm text-red-500">{error}</p>
             </div>
           )}
@@ -94,7 +95,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-8 py-4 border-2 border-transparent bg-accent text-black font-mono text-lg font-semibold hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full border-2 border-transparent bg-accent px-8 py-4 font-mono text-lg font-semibold text-black transition-colors hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>

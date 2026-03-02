@@ -8,9 +8,11 @@ interface EmptyStateProps {
 
 export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
-    <div className="brutalist-border p-12 flex flex-col items-center justify-center text-center space-y-4">
-      <h3 className="text-lg font-bold font-mono">{title}</h3>
-      <p className="text-foreground/60 font-mono text-sm max-w-sm">{description}</p>
+    <div className="brutalist-border flex flex-col items-center justify-center space-y-4 p-12 text-center">
+      <h3 className="font-mono text-lg font-bold">{title}</h3>
+      <p className="max-w-sm font-mono text-sm text-foreground/60">
+        {description}
+      </p>
       {action && <div className="pt-2">{action}</div>}
     </div>
   )

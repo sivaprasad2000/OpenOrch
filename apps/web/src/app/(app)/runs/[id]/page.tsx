@@ -12,12 +12,12 @@ import {
 } from 'lucide-react'
 import { testRunService } from '@/features/test-runs/services/test-run.service'
 import { TERMINAL_RUN_STATUSES } from '@/features/test-runs/types'
-import type { RunStatus, StepMarker, StepResult } from '@/features/test-runs/types'
+import type { StepMarker, StepResult } from '@/features/test-runs/types'
 import { usePolling } from '@/hooks/use-polling'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { runStatusToBadge } from '@/lib/status'
-import { formatDateTime, formatDuration, shortId } from '@/lib/format'
+import { formatDateTime, shortId } from '@/lib/format'
 import { VideoPlayer, formatTime } from '@/components/ui/video-player'
 import type { VideoPlayerHandle } from '@/components/ui/video-player'
 
@@ -44,7 +44,8 @@ function buildGroups(markers: StepMarker[]): StepGroup[] {
 function getActiveIndex(markers: StepMarker[], currentTime: number): number {
   for (let i = 0; i < markers.length; i++) {
     const start = markers[i].started_at_seconds
-    const end = i < markers.length - 1 ? markers[i + 1].started_at_seconds : Infinity
+    const end =
+      i < markers.length - 1 ? markers[i + 1].started_at_seconds : Infinity
     if (currentTime >= start && currentTime < end) return i
   }
   return -1
@@ -83,7 +84,10 @@ function StepListPanel({
   useEffect(() => {
     if (activeIndex >= 0 && activeIndex !== didAutoScrollRef.current) {
       didAutoScrollRef.current = activeIndex
-      stepRefs.current[activeIndex]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      stepRefs.current[activeIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      })
     }
   }, [activeIndex])
 
@@ -111,7 +115,7 @@ function StepListPanel({
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="h-12 bg-foreground/[0.04] border-b border-border animate-pulse"
+            className="h-12 animate-pulse border-b border-border bg-foreground/[0.04]"
             style={{ opacity: 1 - i * 0.15 }}
           />
         ))}
@@ -122,7 +126,9 @@ function StepListPanel({
   if (markers.length === 0) {
     return (
       <div className="p-6 text-center">
-        <p className="font-mono text-sm text-foreground/30">Steps will appear as the run progresses...</p>
+        <p className="font-mono text-sm text-foreground/30">
+          Steps will appear as the run progresses...
+        </p>
       </div>
     )
   }
@@ -137,112 +143,135 @@ function StepListPanel({
           {group.name && (
             <button
               onClick={() => toggleGroup(group.name!)}
-              className="w-full flex items-center gap-2 px-4 py-2 bg-foreground/[0.03] border-b border-border hover:bg-foreground/[0.06] transition-colors text-left sticky top-0 z-10"
+              className="sticky top-0 z-10 flex w-full items-center gap-2 border-b border-border bg-foreground/[0.03] px-4 py-2 text-left transition-colors hover:bg-foreground/[0.06]"
             >
               {collapsed.has(group.name) ? (
-                <ChevronRight size={11} className="text-foreground/30 flex-shrink-0" />
+                <ChevronRight
+                  size={11}
+                  className="flex-shrink-0 text-foreground/30"
+                />
               ) : (
-                <ChevronDown size={11} className="text-foreground/30 flex-shrink-0" />
+                <ChevronDown
+                  size={11}
+                  className="flex-shrink-0 text-foreground/30"
+                />
               )}
-              <span className="font-mono text-xs text-foreground/50 truncate">{group.name}</span>
-              <span className="font-mono text-[10px] text-foreground/25 ml-auto flex-shrink-0">
+              <span className="truncate font-mono text-xs text-foreground/50">
+                {group.name}
+              </span>
+              <span className="ml-auto flex-shrink-0 font-mono text-[10px] text-foreground/25">
                 {group.items.length}
               </span>
             </button>
           )}
 
           {/* Step rows */}
-          {!collapsed.has(group.name ?? '') && group.items.map((m) => {
-            const isActive = m.index === activeIndex
-            const result = stepResultMap.get(m.index)
-            const logs = result?.logs ?? []
-            const isExpanded = expandedSteps.has(m.index)
-            const hasLogs = logs.length > 0 || !!result?.error
+          {!collapsed.has(group.name ?? '') &&
+            group.items.map((m) => {
+              const isActive = m.index === activeIndex
+              const result = stepResultMap.get(m.index)
+              const logs = result?.logs ?? []
+              const isExpanded = expandedSteps.has(m.index)
+              const hasLogs = logs.length > 0 || !!result?.error
 
-            return (
-              <div
-                key={m.index}
-                ref={(el) => { stepRefs.current[m.index] = el }}
-                className={`border-b border-border ${
-                  isActive ? 'bg-accent/[0.06] border-l-2 border-l-accent' : 'border-l-2 border-l-transparent'
-                }`}
-              >
-                {/* Main step row */}
-                <div className="flex items-center gap-1">
-                  {/* Expand toggle */}
-                  <button
-                    onClick={() => toggleStep(m.index)}
-                    className={`flex-shrink-0 flex items-center justify-center w-7 h-full py-3 pl-2 transition-colors ${
-                      hasLogs ? 'text-foreground/30 hover:text-foreground/60' : 'text-foreground/10 cursor-default'
-                    }`}
-                    disabled={!hasLogs}
-                    aria-label={isExpanded ? 'Collapse logs' : 'Expand logs'}
-                  >
-                    {isExpanded
-                      ? <ChevronDown size={10} />
-                      : <ChevronRight size={10} />
-                    }
-                  </button>
-
-                  {/* Seek area */}
-                  <button
-                    onClick={() => onSeekTo(m.started_at_seconds)}
-                    className="flex-1 min-w-0 flex items-center gap-3 pr-4 py-3 text-left transition-colors hover:bg-foreground/[0.04]"
-                  >
-                    {/* Step number */}
-                    <span className="font-mono text-[10px] text-foreground/25 w-5 flex-shrink-0 tabular-nums">
-                      {String(m.index + 1).padStart(2, '0')}
-                    </span>
-
-                    {/* Description */}
-                    <span
-                      className={`font-mono text-xs flex-1 truncate ${
-                        isActive ? 'text-foreground' : 'text-foreground/70'
+              return (
+                <div
+                  key={m.index}
+                  ref={(el) => {
+                    stepRefs.current[m.index] = el
+                  }}
+                  className={`border-b border-border ${
+                    isActive
+                      ? 'border-l-2 border-l-accent bg-accent/[0.06]'
+                      : 'border-l-2 border-l-transparent'
+                  }`}
+                >
+                  {/* Main step row */}
+                  <div className="flex items-center gap-1">
+                    {/* Expand toggle */}
+                    <button
+                      onClick={() => toggleStep(m.index)}
+                      className={`flex h-full w-7 flex-shrink-0 items-center justify-center py-3 pl-2 transition-colors ${
+                        hasLogs
+                          ? 'text-foreground/30 hover:text-foreground/60'
+                          : 'cursor-default text-foreground/10'
                       }`}
+                      disabled={!hasLogs}
+                      aria-label={isExpanded ? 'Collapse logs' : 'Expand logs'}
                     >
-                      {m.description}
-                    </span>
+                      {isExpanded ? (
+                        <ChevronDown size={10} />
+                      ) : (
+                        <ChevronRight size={10} />
+                      )}
+                    </button>
 
-                    {/* Status chip */}
-                    <span
-                      className={`font-mono text-[10px] px-1 py-px border flex-shrink-0 ${
-                        m.status === 'passed'
-                          ? 'border-green-500/50 text-green-400'
-                          : m.status === 'failed'
-                            ? 'border-red-500/50 text-red-400'
-                            : 'border-foreground/20 text-foreground/40'
-                      }`}
+                    {/* Seek area */}
+                    <button
+                      onClick={() => onSeekTo(m.started_at_seconds)}
+                      className="flex min-w-0 flex-1 items-center gap-3 py-3 pr-4 text-left transition-colors hover:bg-foreground/[0.04]"
                     >
-                      {m.status}
-                    </span>
+                      {/* Step number */}
+                      <span className="w-5 flex-shrink-0 font-mono text-[10px] tabular-nums text-foreground/25">
+                        {String(m.index + 1).padStart(2, '0')}
+                      </span>
 
-                    {/* Timestamp */}
-                    <span className="font-mono text-[10px] text-foreground/30 flex-shrink-0 tabular-nums w-10 text-right">
-                      {formatTime(m.started_at_seconds)}
-                    </span>
-                  </button>
-                </div>
+                      {/* Description */}
+                      <span
+                        className={`flex-1 truncate font-mono text-xs ${
+                          isActive ? 'text-foreground' : 'text-foreground/70'
+                        }`}
+                      >
+                        {m.description}
+                      </span>
 
-                {/* Logs panel */}
-                {isExpanded && hasLogs && (
-                  <div className="ml-7 mr-0 border-t border-border bg-foreground/[0.02] px-4 py-3 space-y-1">
-                    {result?.error && (
-                      <p className="font-mono text-[11px] text-red-400 mb-2">{result.error}</p>
-                    )}
-                    {logs.length > 0 ? (
-                      logs.map((line, li) => (
-                        <p key={li} className="font-mono text-[11px] text-foreground/50 leading-relaxed whitespace-pre-wrap break-all">
-                          {line}
-                        </p>
-                      ))
-                    ) : (
-                      <p className="font-mono text-[11px] text-foreground/25">No log lines.</p>
-                    )}
+                      {/* Status chip */}
+                      <span
+                        className={`flex-shrink-0 border px-1 py-px font-mono text-[10px] ${
+                          m.status === 'passed'
+                            ? 'border-green-500/50 text-green-400'
+                            : m.status === 'failed'
+                              ? 'border-red-500/50 text-red-400'
+                              : 'border-foreground/20 text-foreground/40'
+                        }`}
+                      >
+                        {m.status}
+                      </span>
+
+                      {/* Timestamp */}
+                      <span className="w-10 flex-shrink-0 text-right font-mono text-[10px] tabular-nums text-foreground/30">
+                        {formatTime(m.started_at_seconds)}
+                      </span>
+                    </button>
                   </div>
-                )}
-              </div>
-            )
-          })}
+
+                  {/* Logs panel */}
+                  {isExpanded && hasLogs && (
+                    <div className="ml-7 mr-0 space-y-1 border-t border-border bg-foreground/[0.02] px-4 py-3">
+                      {result?.error && (
+                        <p className="mb-2 font-mono text-[11px] text-red-400">
+                          {result.error}
+                        </p>
+                      )}
+                      {logs.length > 0 ? (
+                        logs.map((line, li) => (
+                          <p
+                            key={li}
+                            className="whitespace-pre-wrap break-all font-mono text-[11px] leading-relaxed text-foreground/50"
+                          >
+                            {line}
+                          </p>
+                        ))
+                      ) : (
+                        <p className="font-mono text-[11px] text-foreground/25">
+                          No log lines.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
         </div>
       ))}
     </div>
@@ -251,19 +280,31 @@ function StepListPanel({
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function RunDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function RunDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
   const { id } = use(params)
   const playerRef = useRef<VideoPlayerHandle>(null)
   const [videoTime, setVideoTime] = useState(0)
 
-  const { data: run, loading: runLoading, error: runError } = usePolling(
+  const {
+    data: run,
+    loading: runLoading,
+    error: runError,
+  } = usePolling(
     () => testRunService.getRun(id),
     (data) => TERMINAL_RUN_STATUSES.includes(data.status)
   )
 
-  const { data: playerData, loading: playerLoading, error: playerError } = usePolling(
+  const {
+    data: playerData,
+    loading: playerLoading,
+    error: playerError,
+  } = usePolling(
     () => testRunService.getRunPlayer(id),
-    () => run ? TERMINAL_RUN_STATUSES.includes(run.status) : false
+    () => (run ? TERMINAL_RUN_STATUSES.includes(run.status) : false)
   )
 
   const handleSeekTo = useCallback((seconds: number) => {
@@ -272,17 +313,26 @@ export default function RunDetailPage({ params }: { params: Promise<{ id: string
 
   // ── Loading state ──
   if (runLoading) {
-    return <div className="flex items-center justify-center h-64"><Spinner size="lg" /></div>
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
   // ── Error / not found ──
   if (runError || !run) {
     return (
       <div className="space-y-4">
-        <div className="p-3 border-2 border-red-500 bg-red-500/10">
-          <p className="font-mono text-sm text-red-500">{runError ?? 'Run not found'}</p>
+        <div className="border-2 border-red-500 bg-red-500/10 p-3">
+          <p className="font-mono text-sm text-red-500">
+            {runError ?? 'Run not found'}
+          </p>
         </div>
-        <Link href="/test-groups" className="font-mono text-sm text-accent hover:underline inline-flex items-center gap-1">
+        <Link
+          href="/test-groups"
+          className="inline-flex items-center gap-1 font-mono text-sm text-accent hover:underline"
+        >
           <ArrowLeft size={12} /> Back
         </Link>
       </div>
@@ -296,8 +346,11 @@ export default function RunDetailPage({ params }: { params: Promise<{ id: string
   return (
     <div className="space-y-8">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm font-mono text-foreground/40">
-        <Link href="/test-groups" className="hover:text-accent transition-colors inline-flex items-center gap-1">
+      <div className="flex items-center gap-2 font-mono text-sm text-foreground/40">
+        <Link
+          href="/test-groups"
+          className="inline-flex items-center gap-1 transition-colors hover:text-accent"
+        >
           <ArrowLeft size={12} /> Test Groups
         </Link>
         <span>/</span>
@@ -305,33 +358,45 @@ export default function RunDetailPage({ params }: { params: Promise<{ id: string
       </div>
 
       {/* Header */}
-      <div className={`border p-6 space-y-4 ${isLive ? 'border-accent/70' : 'border-foreground/20'}`}>
+      <div
+        className={`space-y-4 border p-6 ${isLive ? 'border-accent/70' : 'border-foreground/20'}`}
+      >
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-3">
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge variant={runStatusToBadge(run.status)}>{run.status}</Badge>
-              <span className="font-mono text-sm text-foreground/40">{run.browser}</span>
+              <span className="font-mono text-sm text-foreground/40">
+                {run.browser}
+              </span>
               <span className="font-mono text-sm text-foreground/40">
                 {run.viewport_width}×{run.viewport_height}
               </span>
               {isLive && (
-                <span className="inline-flex items-center gap-1.5 text-xs font-mono text-accent">
+                <span className="inline-flex items-center gap-1.5 font-mono text-xs text-accent">
                   <Loader2 size={11} className="animate-spin" />
                   Polling...
                 </span>
               )}
             </div>
-            <div className="flex gap-6 text-sm font-mono">
+            <div className="flex gap-6 font-mono text-sm">
               {run.started_at && (
                 <div>
-                  <span className="text-foreground/30 text-xs uppercase tracking-wider block mb-0.5">Started</span>
-                  <span className="text-foreground/70">{formatDateTime(run.started_at)}</span>
+                  <span className="mb-0.5 block text-xs uppercase tracking-wider text-foreground/30">
+                    Started
+                  </span>
+                  <span className="text-foreground/70">
+                    {formatDateTime(run.started_at)}
+                  </span>
                 </div>
               )}
               {run.completed_at && (
                 <div>
-                  <span className="text-foreground/30 text-xs uppercase tracking-wider block mb-0.5">Completed</span>
-                  <span className="text-foreground/70">{formatDateTime(run.completed_at)}</span>
+                  <span className="mb-0.5 block text-xs uppercase tracking-wider text-foreground/30">
+                    Completed
+                  </span>
+                  <span className="text-foreground/70">
+                    {formatDateTime(run.completed_at)}
+                  </span>
                 </div>
               )}
             </div>
@@ -342,37 +407,45 @@ export default function RunDetailPage({ params }: { params: Promise<{ id: string
       {/* Error box */}
       {run.error && (
         <div className="border-2 border-red-500 bg-red-500/10 p-4">
-          <p className="text-xs font-mono uppercase tracking-wider text-red-500/60 mb-2">Error</p>
+          <p className="mb-2 font-mono text-xs uppercase tracking-wider text-red-500/60">
+            Error
+          </p>
           <p className="font-mono text-sm text-red-400">{run.error}</p>
         </div>
       )}
 
       {/* Player + Step list */}
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
+      <div className="flex flex-col items-start gap-6 lg:flex-row">
         {/* Left: video player */}
-        <div className="w-full lg:flex-[2] min-w-0 space-y-3">
+        <div className="w-full min-w-0 space-y-3 lg:flex-[2]">
           <div className="flex items-center gap-2">
             <Video size={13} className="text-foreground/40" />
-            <p className="text-xs font-mono uppercase tracking-wider text-foreground/30">Recording</p>
+            <p className="font-mono text-xs uppercase tracking-wider text-foreground/30">
+              Recording
+            </p>
           </div>
 
           {/* Player area */}
           {playerLoading && !playerData ? (
             /* Skeleton while first player fetch is in-flight */
-            <div className="aspect-video border border-foreground/20 bg-foreground/[0.03] flex items-center justify-center">
+            <div className="flex aspect-video items-center justify-center border border-foreground/20 bg-foreground/[0.03]">
               <Spinner size="lg" />
             </div>
           ) : playerError ? (
             /* 404 or fetch error */
-            <div className="aspect-video border border-foreground/20 bg-foreground/[0.03] flex flex-col items-center justify-center gap-3">
+            <div className="flex aspect-video flex-col items-center justify-center gap-3 border border-foreground/20 bg-foreground/[0.03]">
               <Video size={32} className="text-foreground/20" />
-              <p className="font-mono text-sm text-foreground/40">Recording not found</p>
+              <p className="font-mono text-sm text-foreground/40">
+                Recording not found
+              </p>
             </div>
           ) : !recordingUrl ? (
             /* recording_url is null */
-            <div className="aspect-video border border-foreground/20 bg-foreground/[0.03] flex flex-col items-center justify-center gap-3">
+            <div className="flex aspect-video flex-col items-center justify-center gap-3 border border-foreground/20 bg-foreground/[0.03]">
               <Video size={32} className="text-foreground/20" />
-              <p className="font-mono text-sm text-foreground/40">Recording not available</p>
+              <p className="font-mono text-sm text-foreground/40">
+                Recording not available
+              </p>
             </div>
           ) : (
             <VideoPlayer
@@ -389,7 +462,7 @@ export default function RunDetailPage({ params }: { params: Promise<{ id: string
             <div className="flex items-center justify-between border border-foreground/20 px-4 py-3">
               <div className="flex items-center gap-2">
                 <ExternalLink size={13} className="text-foreground/40" />
-                <span className="text-xs font-mono uppercase tracking-wider text-foreground/30">
+                <span className="font-mono text-xs uppercase tracking-wider text-foreground/30">
                   Playwright Trace
                 </span>
               </div>
@@ -397,7 +470,7 @@ export default function RunDetailPage({ params }: { params: Promise<{ id: string
                 href={`https://trace.playwright.dev/?trace=${encodeURIComponent(run.trace_url)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-mono text-xs text-accent hover:underline inline-flex items-center gap-1"
+                className="inline-flex items-center gap-1 font-mono text-xs text-accent hover:underline"
               >
                 Open in Trace Viewer <ExternalLink size={10} />
               </a>
@@ -406,13 +479,18 @@ export default function RunDetailPage({ params }: { params: Promise<{ id: string
         </div>
 
         {/* Right: step list */}
-        <div className="w-full lg:flex-1 min-w-0 border border-foreground/20 overflow-y-auto max-h-80 lg:max-h-none lg:self-stretch" style={{ scrollbarWidth: 'thin' }}>
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border sticky top-0 bg-background z-20">
-            <p className="text-xs font-mono uppercase tracking-wider text-foreground/30">
+        <div
+          className="max-h-80 w-full min-w-0 overflow-y-auto border border-foreground/20 lg:max-h-none lg:flex-1 lg:self-stretch"
+          style={{ scrollbarWidth: 'thin' }}
+        >
+          <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-border bg-background px-4 py-3">
+            <p className="font-mono text-xs uppercase tracking-wider text-foreground/30">
               Steps
             </p>
             {markers.length > 0 && (
-              <span className="font-mono text-xs text-foreground/25">({markers.length})</span>
+              <span className="font-mono text-xs text-foreground/25">
+                ({markers.length})
+              </span>
             )}
           </div>
           <StepListPanel

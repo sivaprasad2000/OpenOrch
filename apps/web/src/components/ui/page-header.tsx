@@ -8,11 +8,13 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, action }: PageHeaderProps) {
   return (
-    <div className="flex items-start justify-between mb-8">
+    <div className="mb-8 flex items-start justify-between">
       <div>
-        <h4 className="text-2xl font-bold font-mono">{title}</h4>
+        <h4 className="font-mono text-2xl font-bold">{title}</h4>
         {subtitle && (
-          <p className="text-foreground/60 font-mono text-sm mt-1">{subtitle}</p>
+          <p className="mt-1 font-mono text-sm text-foreground/60">
+            {subtitle}
+          </p>
         )}
       </div>
       {action && <div className="flex-shrink-0">{action}</div>}

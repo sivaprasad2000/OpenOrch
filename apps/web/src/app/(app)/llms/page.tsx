@@ -12,7 +12,15 @@ import { Modal } from '@/components/ui/modal'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { formatDateTime } from '@/lib/format'
 
-const PROVIDERS: LLMProvider[] = ['openai', 'anthropic', 'google', 'mistral', 'cohere', 'meta', 'open_router']
+const PROVIDERS: LLMProvider[] = [
+  'openai',
+  'anthropic',
+  'google',
+  'mistral',
+  'cohere',
+  'meta',
+  'open_router',
+]
 
 const INPUT_CLS =
   'w-full px-3 py-2.5 bg-background border-2 border-foreground/20 text-foreground placeholder:text-foreground/30 font-mono text-sm focus:outline-none focus:border-accent transition-colors'
@@ -61,16 +69,27 @@ export default function LLMsPage() {
     }
   }
 
-  useEffect(() => { loadData() }, [])
+  useEffect(() => {
+    loadData()
+  }, [])
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
     setSaveError('')
     try {
-      await llmService.create({ name: name.trim(), provider, api_key: apiKey, model_name: modelName.trim() })
+      await llmService.create({
+        name: name.trim(),
+        provider,
+        api_key: apiKey,
+        model_name: modelName.trim(),
+      })
       setAddOpen(false)
-      setName(''); setProvider('openai'); setApiKey(''); setModelName(''); setShowKey(false)
+      setName('')
+      setProvider('openai')
+      setApiKey('')
+      setModelName('')
+      setShowKey(false)
       loadData()
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Failed to add')
@@ -96,7 +115,8 @@ export default function LLMsPage() {
     try {
       const patch: { name?: string; model_name?: string; api_key?: string } = {}
       if (editName.trim() !== editLlm.name) patch.name = editName.trim()
-      if (editModelName.trim() !== editLlm.model_name) patch.model_name = editModelName.trim()
+      if (editModelName.trim() !== editLlm.model_name)
+        patch.model_name = editModelName.trim()
       if (editApiKey) patch.api_key = editApiKey
       await llmService.update(editLlm.id, patch)
       setEditLlm(null)
@@ -114,7 +134,9 @@ export default function LLMsPage() {
       await llmService.delete(deleteId)
       setDeleteId(null)
       loadData()
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   async function handleSetActive(llm: LLMResponse) {
@@ -127,13 +149,19 @@ export default function LLMsPage() {
         await llmService.setActive(orgId, llm.id)
       }
       loadData()
-    } catch { /* ignore */ } finally {
+    } catch {
+      /* ignore */
+    } finally {
       setSettingActiveId(null)
     }
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><Spinner size="lg" /></div>
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
   return (
@@ -141,8 +169,10 @@ export default function LLMsPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="font-mono text-3xl font-bold tracking-tight">LLM Providers</h1>
-          <p className="font-mono text-sm text-foreground/40 mt-1">
+          <h1 className="font-mono text-3xl font-bold tracking-tight">
+            LLM Providers
+          </h1>
+          <p className="mt-1 font-mono text-sm text-foreground/40">
             {llms.length} provider{llms.length !== 1 ? 's' : ''} configured
             {llms.some((l) => l.is_active) && (
               <span className="ml-2 text-accent">· 1 active</span>
@@ -167,36 +197,38 @@ export default function LLMsPage() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {llms.map((llm) => {
             const isActive = llm.is_active
             const isSetting = settingActiveId === llm.id
             return (
               <div
                 key={llm.id}
-                className={`border p-5 space-y-4 transition-colors ${
-                  isActive ? 'border-accent/60 bg-accent/[0.02]' : 'border-foreground/20'
+                className={`space-y-4 border p-5 transition-colors ${
+                  isActive
+                    ? 'border-accent/60 bg-accent/[0.02]'
+                    : 'border-foreground/20'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
                       <p className="font-mono font-semibold">{llm.name}</p>
                       {isActive && <Badge variant="success">active</Badge>}
                     </div>
                     <Badge variant="neutral">{llm.provider}</Badge>
                   </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="flex flex-shrink-0 items-center gap-3">
                     <button
                       onClick={() => openEdit(llm)}
-                      className="inline-flex items-center gap-1 text-xs font-mono text-foreground/30 hover:text-foreground transition-colors"
+                      className="inline-flex items-center gap-1 font-mono text-xs text-foreground/30 transition-colors hover:text-foreground"
                     >
                       <Pencil size={11} strokeWidth={1.5} />
                       Edit
                     </button>
                     <button
                       onClick={() => setDeleteId(llm.id)}
-                      className="inline-flex items-center gap-1 text-xs font-mono text-foreground/30 hover:text-red-400 transition-colors"
+                      className="inline-flex items-center gap-1 font-mono text-xs text-foreground/30 transition-colors hover:text-red-400"
                     >
                       <Trash2 size={11} strokeWidth={1.5} />
                       Delete
@@ -206,31 +238,47 @@ export default function LLMsPage() {
 
                 <div className="space-y-2">
                   <div>
-                    <p className="text-xs font-mono uppercase tracking-wider text-foreground/30 mb-1">Model</p>
-                    <p className="font-mono text-sm text-foreground/70">{llm.model_name}</p>
+                    <p className="mb-1 font-mono text-xs uppercase tracking-wider text-foreground/30">
+                      Model
+                    </p>
+                    <p className="font-mono text-sm text-foreground/70">
+                      {llm.model_name}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-xs font-mono uppercase tracking-wider text-foreground/30 mb-1">API Key</p>
-                    <p className="font-mono text-sm text-foreground/40 tracking-widest">●●●●●●●●●●●●</p>
+                    <p className="mb-1 font-mono text-xs uppercase tracking-wider text-foreground/30">
+                      API Key
+                    </p>
+                    <p className="font-mono text-sm tracking-widest text-foreground/40">
+                      ●●●●●●●●●●●●
+                    </p>
                   </div>
                   <div>
-                    <p className="text-xs font-mono uppercase tracking-wider text-foreground/30 mb-1">Added</p>
-                    <p className="font-mono text-sm text-foreground/50">{formatDateTime(llm.created_at)}</p>
+                    <p className="mb-1 font-mono text-xs uppercase tracking-wider text-foreground/30">
+                      Added
+                    </p>
+                    <p className="font-mono text-sm text-foreground/50">
+                      {formatDateTime(llm.created_at)}
+                    </p>
                   </div>
                 </div>
 
-                <div className="pt-1 border-t border-border">
+                <div className="border-t border-border pt-1">
                   <button
                     onClick={() => handleSetActive(llm)}
                     disabled={isSetting || !orgId}
-                    className={`inline-flex items-center gap-1.5 text-xs font-mono transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                    className={`inline-flex items-center gap-1.5 font-mono text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                       isActive
                         ? 'text-accent hover:text-foreground'
                         : 'text-foreground/40 hover:text-accent'
                     }`}
                   >
                     <Zap size={11} strokeWidth={1.5} />
-                    {isSetting ? 'Updating...' : isActive ? 'Unset active' : 'Set as active'}
+                    {isSetting
+                      ? 'Updating...'
+                      : isActive
+                        ? 'Unset active'
+                        : 'Set as active'}
                   </button>
                 </div>
               </div>
@@ -240,10 +288,16 @@ export default function LLMsPage() {
       )}
 
       {/* Add Modal */}
-      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Add LLM Provider">
+      <Modal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        title="Add LLM Provider"
+      >
         <form onSubmit={handleAdd} className="space-y-5">
           <div className="space-y-1.5">
-            <label className="block font-mono text-sm text-foreground/70">Name *</label>
+            <label className="block font-mono text-sm text-foreground/70">
+              Name *
+            </label>
             <input
               required
               placeholder="My OpenAI Key"
@@ -255,7 +309,9 @@ export default function LLMsPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block font-mono text-sm text-foreground/70">Provider *</label>
+            <label className="block font-mono text-sm text-foreground/70">
+              Provider *
+            </label>
             <select
               value={provider}
               onChange={(e) => setProvider(e.target.value as LLMProvider)}
@@ -263,14 +319,18 @@ export default function LLMsPage() {
             >
               {PROVIDERS.map((p) => (
                 <option key={p} value={p}>
-                  {p === 'open_router' ? 'OpenRouter' : p.charAt(0).toUpperCase() + p.slice(1)}
+                  {p === 'open_router'
+                    ? 'OpenRouter'
+                    : p.charAt(0).toUpperCase() + p.slice(1)}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="space-y-1.5">
-            <label className="block font-mono text-sm text-foreground/70">Model Name *</label>
+            <label className="block font-mono text-sm text-foreground/70">
+              Model Name *
+            </label>
             <input
               required
               placeholder="gpt-4o"
@@ -281,7 +341,9 @@ export default function LLMsPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block font-mono text-sm text-foreground/70">API Key *</label>
+            <label className="block font-mono text-sm text-foreground/70">
+              API Key *
+            </label>
             <div className="relative">
               <input
                 required
@@ -294,27 +356,35 @@ export default function LLMsPage() {
               <button
                 type="button"
                 onClick={() => setShowKey((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 transition-colors hover:text-foreground"
               >
-                {showKey ? <EyeOff size={15} strokeWidth={1.5} /> : <Eye size={15} strokeWidth={1.5} />}
+                {showKey ? (
+                  <EyeOff size={15} strokeWidth={1.5} />
+                ) : (
+                  <Eye size={15} strokeWidth={1.5} />
+                )}
               </button>
             </div>
           </div>
 
-          <div className="p-3 border border-foreground/20 bg-foreground/[0.02]">
+          <div className="border border-foreground/20 bg-foreground/[0.02] p-3">
             <p className="font-mono text-xs text-foreground/40">
               Your API key is stored securely and never exposed in the UI.
             </p>
           </div>
 
           {saveError && (
-            <div className="p-3 border-2 border-red-500 bg-red-500/10">
+            <div className="border-2 border-red-500 bg-red-500/10 p-3">
               <p className="font-mono text-sm text-red-500">{saveError}</p>
             </div>
           )}
 
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setAddOpen(false)} className={SEC_BTN}>
+            <button
+              type="button"
+              onClick={() => setAddOpen(false)}
+              className={SEC_BTN}
+            >
               Cancel
             </button>
             <button type="submit" disabled={saving} className={PRI_BTN}>
@@ -325,10 +395,16 @@ export default function LLMsPage() {
       </Modal>
 
       {/* Edit Modal */}
-      <Modal open={!!editLlm} onClose={() => setEditLlm(null)} title="Edit LLM Provider">
+      <Modal
+        open={!!editLlm}
+        onClose={() => setEditLlm(null)}
+        title="Edit LLM Provider"
+      >
         <form onSubmit={handleEdit} className="space-y-5">
           <div className="space-y-1.5">
-            <label className="block font-mono text-sm text-foreground/70">Name *</label>
+            <label className="block font-mono text-sm text-foreground/70">
+              Name *
+            </label>
             <input
               required
               value={editName}
@@ -339,7 +415,9 @@ export default function LLMsPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block font-mono text-sm text-foreground/70">Model Name *</label>
+            <label className="block font-mono text-sm text-foreground/70">
+              Model Name *
+            </label>
             <input
               required
               value={editModelName}
@@ -349,7 +427,9 @@ export default function LLMsPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block font-mono text-sm text-foreground/70">New API Key</label>
+            <label className="block font-mono text-sm text-foreground/70">
+              New API Key
+            </label>
             <div className="relative">
               <input
                 type={editShowKey ? 'text' : 'password'}
@@ -361,21 +441,29 @@ export default function LLMsPage() {
               <button
                 type="button"
                 onClick={() => setEditShowKey((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 transition-colors hover:text-foreground"
               >
-                {editShowKey ? <EyeOff size={15} strokeWidth={1.5} /> : <Eye size={15} strokeWidth={1.5} />}
+                {editShowKey ? (
+                  <EyeOff size={15} strokeWidth={1.5} />
+                ) : (
+                  <Eye size={15} strokeWidth={1.5} />
+                )}
               </button>
             </div>
           </div>
 
           {editError && (
-            <div className="p-3 border-2 border-red-500 bg-red-500/10">
+            <div className="border-2 border-red-500 bg-red-500/10 p-3">
               <p className="font-mono text-sm text-red-500">{editError}</p>
             </div>
           )}
 
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setEditLlm(null)} className={SEC_BTN}>
+            <button
+              type="button"
+              onClick={() => setEditLlm(null)}
+              className={SEC_BTN}
+            >
               Cancel
             </button>
             <button type="submit" disabled={editSaving} className={PRI_BTN}>

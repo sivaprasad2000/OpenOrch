@@ -5,23 +5,23 @@ export function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-border py-12 mt-24">
+    <footer className="mt-24 border-t border-border py-12">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div>
-            <h3 className="font-bold font-mono text-lg mb-4">OpenOrch</h3>
+            <h3 className="mb-4 font-mono text-lg font-bold">OpenOrch</h3>
             <p className="text-sm text-muted">
               AI-assisted UI testing. Describe your UI, we write the tests.
             </p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Product</h4>
+            <h4 className="mb-4 font-semibold">Product</h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="#features"
-                  className="text-sm text-muted hover:text-foreground transition-colors"
+                  className="text-sm text-muted transition-colors hover:text-foreground"
                 >
                   Features
                 </Link>
@@ -29,7 +29,7 @@ export function Footer() {
               <li>
                 <Link
                   href="#"
-                  className="text-sm text-muted hover:text-foreground transition-colors"
+                  className="text-sm text-muted transition-colors hover:text-foreground"
                 >
                   Pricing
                 </Link>
@@ -37,7 +37,7 @@ export function Footer() {
               <li>
                 <Link
                   href="#"
-                  className="text-sm text-muted hover:text-foreground transition-colors"
+                  className="text-sm text-muted transition-colors hover:text-foreground"
                 >
                   Documentation
                 </Link>
@@ -46,12 +46,12 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Company</h4>
+            <h4 className="mb-4 font-semibold">Company</h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="#"
-                  className="text-sm text-muted hover:text-foreground transition-colors"
+                  className="text-sm text-muted transition-colors hover:text-foreground"
                 >
                   About
                 </Link>
@@ -59,7 +59,7 @@ export function Footer() {
               <li>
                 <Link
                   href="#"
-                  className="text-sm text-muted hover:text-foreground transition-colors"
+                  className="text-sm text-muted transition-colors hover:text-foreground"
                 >
                   Blog
                 </Link>
@@ -67,7 +67,7 @@ export function Footer() {
               <li>
                 <Link
                   href="#"
-                  className="text-sm text-muted hover:text-foreground transition-colors"
+                  className="text-sm text-muted transition-colors hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -76,12 +76,12 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Legal</h4>
+            <h4 className="mb-4 font-semibold">Legal</h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="#"
-                  className="text-sm text-muted hover:text-foreground transition-colors"
+                  className="text-sm text-muted transition-colors hover:text-foreground"
                 >
                   Privacy
                 </Link>
@@ -89,7 +89,7 @@ export function Footer() {
               <li>
                 <Link
                   href="#"
-                  className="text-sm text-muted hover:text-foreground transition-colors"
+                  className="text-sm text-muted transition-colors hover:text-foreground"
                 >
                   Terms
                 </Link>
@@ -98,8 +98,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border">
-          <p className="text-sm text-muted text-center">
+        <div className="mt-12 border-t border-border pt-8">
+          <p className="text-center text-sm text-muted">
             &copy; {currentYear} OpenOrch. All rights reserved.
           </p>
         </div>

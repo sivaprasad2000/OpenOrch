@@ -17,7 +17,9 @@ export const userService = {
     return apiPut('/api/v1/users/me/active-organization', body)
   },
 
-  createOrganization(data: CreateOrganizationRequest): Promise<OrganizationResponse> {
+  createOrganization(
+    data: CreateOrganizationRequest
+  ): Promise<OrganizationResponse> {
     return apiPost('/api/v1/organizations', data)
   },
 
