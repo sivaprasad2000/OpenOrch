@@ -1,8 +1,6 @@
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-
 import uuid
 
 from sqlalchemy import ForeignKey, String
@@ -15,7 +13,6 @@ if TYPE_CHECKING:
 
 
 class Organization(Base, TimestampMixin, TableNameMixin):
-
     __tablename__ = "organizations"  # type: ignore[assignment]
 
     id: Mapped[str] = mapped_column(
@@ -29,7 +26,7 @@ class Organization(Base, TimestampMixin, TableNameMixin):
         default=None,
     )
 
-    user_organizations: Mapped[list["UserOrganization"]] = relationship(
+    user_organizations: Mapped[list[UserOrganization]] = relationship(
         back_populates="organization", cascade="all, delete-orphan", lazy="selectin"
     )
 

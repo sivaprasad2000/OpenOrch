@@ -1,11 +1,11 @@
-
 import asyncio
+
 import asyncpg
+
 from app.core.config import settings
 
 
-async def create_database():
-
+async def create_database() -> None:
     url_parts = settings.DATABASE_URL.replace("postgresql+asyncpg://", "").split("/")
     dbname = url_parts[-1]
     connection_str = url_parts[0]
@@ -15,17 +15,11 @@ async def create_database():
     host, port = host_port.split(":")
 
     conn = await asyncpg.connect(
-        host=host,
-        port=port,
-        user=user,
-        password=password,
-        database="postgres"
+        host=host, port=port, user=user, password=password, database="postgres"
     )
 
     try:
-        exists = await conn.fetchval(
-            "SELECT 1 FROM pg_database WHERE datname = $1", dbname
-        )
+        exists = await conn.fetchval("SELECT 1 FROM pg_database WHERE datname = $1", dbname)
 
         if not exists:
             await conn.execute(f'CREATE DATABASE "{dbname}"')

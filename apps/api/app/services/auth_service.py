@@ -1,7 +1,5 @@
-
-import secrets
 from datetime import timedelta
-from typing import Optional
+import secrets
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,8 +14,7 @@ from app.services.email_service import EmailService
 
 
 class AuthService:
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.user_repo = UserRepository(db)
         self.otp_repo = OTPRepository(db)
@@ -40,7 +37,7 @@ class AuthService:
             email=signup_data.email.lower(),
             name=signup_data.name,
             password=hashed_password,
-            is_verified=False
+            is_verified=False,
         )
 
         try:
@@ -52,25 +49,23 @@ class AuthService:
                 user_id=created_user.id,
                 code=otp_code,
                 expires_at=OTP.generate_expiry(minutes=10),
-                is_used=False
+                is_used=False,
             )
             await self.otp_repo.create(otp)
 
             await self.db.commit()
 
             await self.email_service.send_verification_email(
-                to_email=created_user.email,
-                user_name=created_user.name,
-                otp_code=otp_code
+                to_email=created_user.email, user_name=created_user.name, otp_code=otp_code
             )
 
             return created_user, otp_code
 
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise
 
-    async def signin(self, signin_data: SigninRequest) -> Optional[User]:
+    async def signin(self, signin_data: SigninRequest) -> User | None:
         user = await self.user_repo.get_by_email(signin_data.email)
 
         if not user:
@@ -81,7 +76,7 @@ class AuthService:
 
         return user
 
-    async def verify_email(self, email: str, otp_code: str) -> Optional[User]:
+    async def verify_email(self, email: str, otp_code: str) -> User | None:
         user = await self.user_repo.get_by_email(email)
 
         if not user:
@@ -104,16 +99,13 @@ class AuthService:
 
             await self.db.commit()
 
-            await self.email_service.send_welcome_email(
-                to_email=user.email,
-                user_name=user.name
-            )
+            await self.email_service.send_welcome_email(to_email=user.email, user_name=user.name)
 
             return user
 
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise
 
     async def resend_otp(self, email: str) -> str:
         user = await self.user_repo.get_by_email(email)
@@ -133,32 +125,25 @@ class AuthService:
                 user_id=user.id,
                 code=otp_code,
                 expires_at=OTP.generate_expiry(minutes=10),
-                is_used=False
+                is_used=False,
             )
             await self.otp_repo.create(otp)
 
             await self.db.commit()
 
             await self.email_service.send_verification_email(
-                to_email=user.email,
-                user_name=user.name,
-                otp_code=otp_code
+                to_email=user.email, user_name=user.name, otp_code=otp_code
             )
 
             return otp_code
 
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise
 
     def create_access_token(self, user: User) -> str:
-        token_data = {
-            "sub": user.id,
-            "email": user.email,
-            "is_verified": user.is_verified
-        }
+        token_data = {"sub": user.id, "email": user.email, "is_verified": user.is_verified}
 
         return create_access_token(
-            data=token_data,
-            expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+            data=token_data, expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         )

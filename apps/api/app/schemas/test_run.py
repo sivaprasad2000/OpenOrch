@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from typing import Any
 
@@ -9,7 +8,6 @@ from app.models.test_run import RunStatus
 
 
 class RunConfig(BaseModel):
-
     browser: BrowserType = BrowserType.CHROMIUM
     base_url_override: str | None = Field(None, max_length=2048)
     viewport_width: int = Field(1280, gt=0)
@@ -25,7 +23,6 @@ class LLMConfig(BaseModel):
 
 
 class StepResult(BaseModel):
-
     index: int
     action: str
     group: str | None = None
@@ -39,7 +36,6 @@ class StepResult(BaseModel):
 
 
 class TestRunResultUpdate(BaseModel):
-
     status: RunStatus
     step_results: list[StepResult]
     recording_url: str | None = None
@@ -50,7 +46,6 @@ class TestRunResultUpdate(BaseModel):
 
 
 class TestRunResponse(BaseModel):
-
     id: str
     test_case_id: str | None
     test_group_run_id: str | None
@@ -92,7 +87,6 @@ class PlayerResponse(BaseModel):
 
 
 class TestRunDetailResponse(BaseModel):
-
     id: str
     test_case_id: str | None
     test_group_run_id: str | None

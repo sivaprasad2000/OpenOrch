@@ -1,21 +1,20 @@
-
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_database
-from app.services.auth_service import AuthService
 from app.schemas.auth import (
+    ResendOTPRequest,
+    ResendOTPResponse,
+    SigninRequest,
     SignupRequest,
     SignupResponse,
-    SigninRequest,
     TokenResponse,
     VerifyEmailRequest,
     VerifyEmailResponse,
-    ResendOTPRequest,
-    ResendOTPResponse
 )
+from app.services.auth_service import AuthService
 
 router = APIRouter()
 
@@ -35,19 +34,15 @@ async def signup(
         return SignupResponse(
             message="User registered successfully. Please verify your email with the OTP sent.",
             user_id=user.id,
-            email=user.email
+            email=user.email,
         )
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to register user"
-        )
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to register user"
+        ) from e
 
 
 @router.post("/signin", response_model=TokenResponse)
@@ -60,8 +55,7 @@ async def signin(
 
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect email or password"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password"
             )
 
         access_token = auth_service.create_access_token(user)
@@ -71,16 +65,15 @@ async def signin(
             token_type="bearer",
             user_id=user.id,
             email=user.email,
-            is_verified=user.is_verified
+            is_verified=user.is_verified,
         )
 
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to sign in"
-        )
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to sign in"
+        ) from e
 
 
 @router.post("/verify-email", response_model=VerifyEmailResponse)
@@ -89,35 +82,25 @@ async def verify_email(
     auth_service: AuthService = Depends(get_auth_service),
 ) -> Any:
     try:
-        user = await auth_service.verify_email(
-            email=verify_data.email,
-            otp_code=verify_data.otp
-        )
+        user = await auth_service.verify_email(email=verify_data.email, otp_code=verify_data.otp)
 
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid OTP or user not found"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid OTP or user not found"
             )
 
         access_token = auth_service.create_access_token(user)
 
         return VerifyEmailResponse(
-            message="Email verified successfully",
-            access_token=access_token,
-            token_type="bearer"
+            message="Email verified successfully", access_token=access_token, token_type="bearer"
         )
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to verify email"
-        )
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to verify email"
+        ) from e
 
 
 @router.post("/resend-otp", response_model=ResendOTPResponse)
@@ -126,19 +109,13 @@ async def resend_otp(
     auth_service: AuthService = Depends(get_auth_service),
 ) -> Any:
     try:
-        otp_code = await auth_service.resend_otp(resend_data.email)
+        await auth_service.resend_otp(resend_data.email)
 
-        return ResendOTPResponse(
-            message="OTP sent successfully. Please check your email."
-        )
+        return ResendOTPResponse(message="OTP sent successfully. Please check your email.")
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to resend OTP"
-        )
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to resend OTP"
+        ) from e

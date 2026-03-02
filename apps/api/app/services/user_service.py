@@ -1,6 +1,3 @@
-
-from typing import Optional
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import get_password_hash, verify_password
@@ -11,8 +8,7 @@ from app.schemas.user import UserCreate, UserUpdate
 
 
 class UserService:
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.user_repo = UserRepository(db)
         self.user_org_repo = UserOrganizationRepository(db)
@@ -30,34 +26,30 @@ class UserService:
             email=user_data.email.lower(),
             name=user_data.name,
             password=hashed_password,
-            is_verified=False
+            is_verified=False,
         )
 
         try:
             created_user = await self.user_repo.create(user)
             await self.db.commit()
             return created_user
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise
 
-    async def get_user_by_id(self, user_id: str) -> Optional[User]:
+    async def get_user_by_id(self, user_id: str) -> User | None:
         return await self.user_repo.get_by_id(user_id)
 
-    async def get_user_with_organizations(self, user_id: str) -> Optional[User]:
+    async def get_user_with_organizations(self, user_id: str) -> User | None:
         return await self.user_repo.get_by_id_with_organizations(user_id)
 
-    async def get_user_by_email(self, email: str) -> Optional[User]:
+    async def get_user_by_email(self, email: str) -> User | None:
         return await self.user_repo.get_by_email(email)
 
     async def get_users(self, skip: int = 0, limit: int = 100) -> list[User]:
-        return await self.user_repo.get_all(
-            skip=skip,
-            limit=limit,
-            order_by=User.created_at.desc()
-        )
+        return await self.user_repo.get_all(skip=skip, limit=limit, order_by=User.created_at.desc())
 
-    async def update_user(self, user_id: str, user_data: UserUpdate) -> Optional[User]:
+    async def update_user(self, user_id: str, user_data: UserUpdate) -> User | None:
         user = await self.user_repo.get_by_id(user_id)
         if not user:
             return None
@@ -80,9 +72,9 @@ class UserService:
             await self.db.commit()
             return updated_user
 
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise
 
     async def delete_user(self, user_id: str) -> bool:
         user = await self.user_repo.get_by_id(user_id)
@@ -93,11 +85,11 @@ class UserService:
             await self.user_repo.delete(user)
             await self.db.commit()
             return True
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise
 
-    async def verify_user_email(self, user_id: str) -> Optional[User]:
+    async def verify_user_email(self, user_id: str) -> User | None:
         user = await self.user_repo.get_by_id(user_id)
         if not user:
             return None
@@ -107,11 +99,11 @@ class UserService:
             updated_user = await self.user_repo.update(user)
             await self.db.commit()
             return updated_user
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise
 
-    async def authenticate_user(self, email: str, password: str) -> Optional[User]:
+    async def authenticate_user(self, email: str, password: str) -> User | None:
         user = await self.user_repo.get_by_email(email)
 
         if not user:
@@ -131,9 +123,7 @@ class UserService:
     async def search_users_by_name(self, name: str, skip: int = 0, limit: int = 100) -> list[User]:
         return await self.user_repo.search_by_name(name=name, skip=skip, limit=limit)
 
-    async def set_active_organization(
-        self, user_id: str, organization_id: str
-    ) -> Optional[User]:
+    async def set_active_organization(self, user_id: str, organization_id: str) -> User | None:
         user = await self.user_repo.get_by_id(user_id)
         if not user:
             return None
@@ -146,6 +136,6 @@ class UserService:
             updated_user = await self.user_repo.update(user)
             await self.db.commit()
             return updated_user
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise

@@ -1,19 +1,15 @@
-
-import re
 from datetime import datetime
-from typing import Any
+import re
 
 from sqlalchemy import DateTime, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
 
 
 class Base(DeclarativeBase):
-
     pass
 
 
 class TimestampMixin:
-
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -29,7 +25,6 @@ class TimestampMixin:
 
 
 class TableNameMixin:
-
     @declared_attr.directive
     @classmethod
     def __tablename__(cls) -> str:

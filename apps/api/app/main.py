@@ -1,15 +1,9 @@
-
-import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+import logging
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
@@ -17,6 +11,11 @@ from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.database import close_db, init_db
 from app.core.rabbitmq import close_rabbitmq, init_rabbitmq
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
 
 
 @asynccontextmanager
@@ -29,7 +28,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 def create_application() -> FastAPI:
-
     app = FastAPI(
         title=settings.APP_NAME,
         version=settings.APP_VERSION,
@@ -38,7 +36,7 @@ def create_application() -> FastAPI:
         redoc_url="/redoc",
         redoc_js_url="https://unpkg.com/redoc@latest/bundles/redoc.standalone.js",
         openapi_url="/openapi.json",
-        lifespan=lifespan
+        lifespan=lifespan,
     )
 
     app.add_middleware(
@@ -74,7 +72,7 @@ def create_application() -> FastAPI:
                 "message": f"Welcome to {settings.APP_NAME}",
                 "version": settings.APP_VERSION,
                 "docs": "/docs",
-                "health": f"{settings.API_V1_PREFIX}/health"
+                "health": f"{settings.API_V1_PREFIX}/health",
             }
         )
 
@@ -86,9 +84,5 @@ app = create_application()
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        "app.main:app",
-        host=settings.HOST,
-        port=settings.PORT,
-        reload=settings.DEBUG
-    )
+
+    uvicorn.run("app.main:app", host=settings.HOST, port=settings.PORT, reload=settings.DEBUG)

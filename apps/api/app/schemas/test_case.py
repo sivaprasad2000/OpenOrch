@@ -1,9 +1,8 @@
-
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Literal, Union
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -32,7 +31,7 @@ class StepGroup(BaseModel):
 class TestCasePayload(BaseModel):
     """Internal schema used to parse and validate steps during test execution."""
 
-    steps: list[Union[StepGroup, Step]] = Field(default_factory=list)
+    steps: list[StepGroup | Step] = Field(default_factory=list)
 
 
 def _validate_payload(value: dict[str, Any]) -> dict[str, Any]:

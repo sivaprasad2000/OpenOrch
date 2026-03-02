@@ -5,6 +5,26 @@ description = "OpenOrch Backend API"
 requires-python = ">=3.11"
 
 [tool.ruff]
+# Exclude common directories
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "alembic/versions",
+    "build",
+    "dist",
+]
+
+line-length = 100
+indent-width = 4
+
+# Target Python 3.11+
+target-version = "py311"
+
+[tool.ruff.lint]
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
 # Add `I` for isort (import sorting)
 select = [
@@ -44,36 +64,27 @@ select = [
 
 # Ignore rules that are too strict or not applicable
 ignore = [
-    "ANN101", # Missing type annotation for self
-    "ANN102", # Missing type annotation for cls
-    "ANN401", # Dynamically typed expressions (Any)
-    "B008",   # Do not perform function call in argument defaults (FastAPI Depends)
+    "ANN101",  # Missing type annotation for self
+    "ANN102",  # Missing type annotation for cls
+    "ANN401",  # Dynamically typed expressions (Any)
+    "B008",    # Do not perform function call in argument defaults (FastAPI Depends)
     "PLR0913", # Too many arguments to function call
-    "TRY003", # Avoid specifying long messages outside exception class
+    "TRY003",  # Avoid specifying long messages outside exception class
+    "TRY300",  # return in try block - style preference
+    "TRY301",  # abstract raise to inner function - style preference
+    "G004",    # logging f-string - style preference
+    "SIM102",  # nested if - style preference
+    "PLW0602", # global variable
+    "PLW0603", # global variable
+    "ARG001",  # unused function argument (common in FastAPI callbacks)
+    "ARG002",  # unused method argument
+    "ARG005",  # unused lambda argument
+    "PT004",   # fixture return type annotation
 ]
 
 # Allow autofix for all enabled rules
 fixable = ["ALL"]
 unfixable = []
-
-# Exclude common directories
-exclude = [
-    ".git",
-    ".mypy_cache",
-    ".ruff_cache",
-    ".venv",
-    "venv",
-    "__pycache__",
-    "alembic/versions",
-    "build",
-    "dist",
-]
-
-line-length = 100
-indent-width = 4
-
-# Target Python 3.11+
-target-version = "py311"
 
 [tool.ruff.format]
 # Use double quotes for strings
@@ -168,6 +179,9 @@ module = [
     "passlib.*",
     "jose.*",
     "asyncpg.*",
+    "anthropic.*",
+    "openai.*",
+    "aio_pika.*",
 ]
 ignore_missing_imports = true
 

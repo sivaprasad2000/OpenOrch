@@ -1,6 +1,3 @@
-
-from typing import Optional
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.organization import Organization
@@ -12,8 +9,7 @@ from app.schemas.organization import OrganizationCreate, OrganizationUpdate
 
 
 class OrganizationService:
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.org_repo = OrganizationRepository(db)
         self.user_org_repo = UserOrganizationRepository(db)
@@ -43,22 +39,20 @@ class OrganizationService:
             await self.db.rollback()
             raise
 
-    async def get_organization_by_id(self, org_id: str) -> Optional[Organization]:
+    async def get_organization_by_id(self, org_id: str) -> Organization | None:
         return await self.org_repo.get_by_id(org_id)
 
-    async def get_organization_by_name(self, name: str) -> Optional[Organization]:
+    async def get_organization_by_name(self, name: str) -> Organization | None:
         return await self.org_repo.get_by_name(name)
 
-    async def get_organizations(
-        self, skip: int = 0, limit: int = 100
-    ) -> list[Organization]:
+    async def get_organizations(self, skip: int = 0, limit: int = 100) -> list[Organization]:
         return await self.org_repo.get_all(
             skip=skip, limit=limit, order_by=Organization.created_at.desc()
         )
 
     async def update_organization(
         self, org_id: str, org_data: OrganizationUpdate
-    ) -> Optional[Organization]:
+    ) -> Organization | None:
         organization = await self.org_repo.get_by_id(org_id)
         if not organization:
             return None

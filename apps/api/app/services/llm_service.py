@@ -1,4 +1,3 @@
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.llm import LLM
@@ -9,8 +8,7 @@ from app.schemas.llm import LLMCreate, LLMResponse, LLMUpdate
 
 
 class LLMService:
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.llm_repo = LLMRepository(db)
         self.user_repo = UserRepository(db)
@@ -33,9 +31,9 @@ class LLMService:
             created_llm = await self.llm_repo.create(llm)
             await self.db.commit()
             return created_llm
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise
 
     async def list_llms(self, user_id: str) -> list[LLMResponse]:
         user = await self.user_repo.get_by_id(user_id)
@@ -90,6 +88,6 @@ class LLMService:
             await self.llm_repo.delete(llm)
             await self.db.commit()
             return True
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise

@@ -1,4 +1,3 @@
-
 import json
 import logging
 
@@ -17,8 +16,8 @@ async def init_rabbitmq() -> None:
     try:
         _connection = await aio_pika.connect_robust(settings.RABBITMQ_URL)
         logger.info("RabbitMQ connection established")
-    except Exception as e:
-        logger.error("Failed to connect to RabbitMQ: %s", e)
+    except Exception:
+        logger.exception("Failed to connect to RabbitMQ")
 
 
 async def close_rabbitmq() -> None:

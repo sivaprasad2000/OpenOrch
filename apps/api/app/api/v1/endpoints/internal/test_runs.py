@@ -1,11 +1,15 @@
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from typing import Any
-
 from app.api.deps import get_database, verify_internal_secret
-from app.schemas.test_run import LLMConfig, TestRunDetailResponse, TestRunResponse, TestRunResultUpdate
+from app.schemas.test_run import (
+    LLMConfig,
+    TestRunDetailResponse,
+    TestRunResponse,
+    TestRunResultUpdate,
+)
 from app.services.test_run_service import TestRunService
 
 router = APIRouter()

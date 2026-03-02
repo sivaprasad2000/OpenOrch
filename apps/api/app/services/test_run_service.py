@@ -1,6 +1,3 @@
-
-from typing import Optional
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.rabbitmq import publish_test_run
@@ -18,8 +15,7 @@ from app.schemas.test_run import RunConfig, TestRunResultUpdate
 
 
 class TestRunService:
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.test_run_repo = TestRunRepository(db)
         self.test_case_repo = TestCaseRepository(db)
@@ -69,7 +65,7 @@ class TestRunService:
 
         return created
 
-    async def get_test_run(self, user_id: str, run_id: str) -> Optional[TestRun]:
+    async def get_test_run(self, user_id: str, run_id: str) -> TestRun | None:
         user = await self.user_repo.get_by_id(user_id)
         if not user or not user.active_organization_id:
             raise ValueError("No active organization set")
@@ -103,14 +99,12 @@ class TestRunService:
         if not test_group or test_group.organization_id != user.active_organization_id:
             raise LookupError("Test case not found")
 
-        return await self.test_run_repo.get_by_test_case_id(
-            test_case_id, skip=skip, limit=limit
-        )
+        return await self.test_run_repo.get_by_test_case_id(test_case_id, skip=skip, limit=limit)
 
-    async def get_run_detail(self, run_id: str) -> Optional[TestRun]:
+    async def get_run_detail(self, run_id: str) -> TestRun | None:
         return await self.test_run_repo.get_by_id(run_id)
 
-    async def get_run_detail_with_llm(self, run_id: str) -> tuple[Optional[TestRun], Optional[LLM]]:
+    async def get_run_detail_with_llm(self, run_id: str) -> tuple[TestRun | None, LLM | None]:
         """Load the test run and the org's active LLM (if any)."""
         test_run = await self.test_run_repo.get_by_id(run_id)
         if not test_run:
@@ -131,9 +125,7 @@ class TestRunService:
         llm = await self.llm_repo.get_by_id(org.active_llm_id)
         return test_run, llm
 
-    async def update_run_result(
-        self, run_id: str, data: TestRunResultUpdate
-    ) -> Optional[TestRun]:
+    async def update_run_result(self, run_id: str, data: TestRunResultUpdate) -> TestRun | None:
         test_run = await self.test_run_repo.get_by_id(run_id)
         if not test_run:
             return None

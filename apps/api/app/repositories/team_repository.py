@@ -1,6 +1,3 @@
-
-from typing import Optional
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,8 +6,7 @@ from app.repositories.base import BaseRepository
 
 
 class TeamRepository(BaseRepository[Team]):
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         super().__init__(Team, db)
 
     async def get_by_organization_id(
@@ -25,9 +21,7 @@ class TeamRepository(BaseRepository[Team]):
         )
         return list(result.scalars().all())
 
-    async def get_by_id_and_org(
-        self, team_id: str, organization_id: str
-    ) -> Optional[Team]:
+    async def get_by_id_and_org(self, team_id: str, organization_id: str) -> Team | None:
         result = await self.db.execute(
             select(Team).where(
                 Team.id == team_id,

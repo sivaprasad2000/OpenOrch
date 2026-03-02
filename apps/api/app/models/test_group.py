@@ -1,9 +1,8 @@
-
 from __future__ import annotations
 
 import enum
-import uuid
 from typing import TYPE_CHECKING
+import uuid
 
 from sqlalchemy import Enum, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -17,13 +16,11 @@ if TYPE_CHECKING:
 
 
 class TestGroupStatus(str, enum.Enum):
-
     ACTIVE = "active"
     ARCHIVED = "archived"
 
 
 class TestGroup(Base, TimestampMixin, TableNameMixin):
-
     id: Mapped[str] = mapped_column(
         String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4())
     )
@@ -43,10 +40,8 @@ class TestGroup(Base, TimestampMixin, TableNameMixin):
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
     )
 
-    organization: Mapped["Organization"] = relationship(lazy="selectin")
-    creator: Mapped["User | None"] = relationship(
-        foreign_keys=[created_by], lazy="selectin"
-    )
+    organization: Mapped[Organization] = relationship(lazy="selectin")
+    creator: Mapped[User | None] = relationship(foreign_keys=[created_by], lazy="selectin")
 
     def __repr__(self) -> str:
         return f"<TestGroup(id={self.id}, name={self.name}, org={self.organization_id})>"

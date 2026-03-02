@@ -1,9 +1,8 @@
-
 from __future__ import annotations
 
 import enum
-import uuid
 from typing import TYPE_CHECKING
+import uuid
 
 from sqlalchemy import Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -30,7 +29,6 @@ class BrowserType(str, enum.Enum):
 
 
 class TestGroupRun(Base, TimestampMixin, TableNameMixin):
-
     id: Mapped[str] = mapped_column(
         String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4())
     )
@@ -51,8 +49,8 @@ class TestGroupRun(Base, TimestampMixin, TableNameMixin):
     viewport_width: Mapped[int] = mapped_column(Integer, nullable=False, default=1280)
     viewport_height: Mapped[int] = mapped_column(Integer, nullable=False, default=720)
 
-    test_group: Mapped["TestGroup | None"] = relationship(lazy="selectin")
-    test_runs: Mapped[list["TestRun"]] = relationship(
+    test_group: Mapped[TestGroup | None] = relationship(lazy="selectin")
+    test_runs: Mapped[list[TestRun]] = relationship(
         back_populates="test_group_run",
         cascade="all, delete-orphan",
         lazy="selectin",

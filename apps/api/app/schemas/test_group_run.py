@@ -1,14 +1,12 @@
-
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
 from app.models.test_group_run import BrowserType, GroupRunStatus
-from app.schemas.test_run import RunConfig, TestRunResponse
+from app.schemas.test_run import TestRunResponse
 
 
 class TestGroupRunResponse(BaseModel):
-
     id: str
     test_group_id: str | None
     status: GroupRunStatus

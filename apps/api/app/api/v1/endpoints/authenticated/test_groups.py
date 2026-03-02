@@ -1,4 +1,3 @@
-
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -31,7 +30,7 @@ async def create_test_group(
     try:
         return await service.create_test_group(user_id, data)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
 
 @router.get("/test-groups", response_model=list[TestGroupResponse])
@@ -45,7 +44,7 @@ async def list_test_groups(
     try:
         return await service.list_test_groups(user_id, skip=skip, limit=limit)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
 
 @router.get("/test-groups/{test_group_id}", response_model=TestGroupResponse)
@@ -58,12 +57,10 @@ async def get_test_group(
     try:
         test_group = await service.get_test_group(user_id, test_group_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
     if not test_group:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Test group not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Test group not found")
 
     return test_group
 
@@ -79,12 +76,10 @@ async def update_test_group(
     try:
         test_group = await service.update_test_group(user_id, test_group_id, data)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
     if not test_group:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Test group not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Test group not found")
 
     return test_group
 
@@ -99,9 +94,7 @@ async def delete_test_group(
     try:
         deleted = await service.delete_test_group(user_id, test_group_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
     if not deleted:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Test group not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Test group not found")

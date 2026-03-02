@@ -1,6 +1,3 @@
-
-from typing import Optional
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.team import Team
@@ -12,8 +9,7 @@ from app.schemas.team import TeamCreate, TeamUpdate
 
 
 class TeamService:
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.team_repo = TeamRepository(db)
         self.user_repo = UserRepository(db)
@@ -39,13 +35,9 @@ class TeamService:
 
             if not is_privileged:
                 if not user.team_id or user.team_id != data.parent_team_id:  # type: ignore[attr-defined]
-                    raise ValueError(
-                        "Members can only create teams under their own team"
-                    )
+                    raise ValueError("Members can only create teams under their own team")
         elif not is_privileged:
-            raise ValueError(
-                "Only owner or admin can create top-level teams"
-            )
+            raise ValueError("Only owner or admin can create top-level teams")
 
         team = Team(
             organization_id=org_id,
@@ -57,13 +49,11 @@ class TeamService:
             created = await self.team_repo.create(team)
             await self.db.commit()
             return created
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise
 
-    async def update_team(
-        self, user_id: str, team_id: str, data: TeamUpdate
-    ) -> Optional[Team]:
+    async def update_team(self, user_id: str, team_id: str, data: TeamUpdate) -> Team | None:
         user = await self.user_repo.get_by_id(user_id)
         if not user or not user.active_organization_id:
             raise ValueError("No active organization set")
@@ -93,6 +83,6 @@ class TeamService:
             updated = await self.team_repo.update(team)
             await self.db.commit()
             return updated
-        except Exception as e:
+        except Exception:
             await self.db.rollback()
-            raise e
+            raise

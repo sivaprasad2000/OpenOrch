@@ -1,8 +1,7 @@
-
 from __future__ import annotations
 
-import uuid
 from typing import TYPE_CHECKING, Any
+import uuid
 
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -15,7 +14,6 @@ if TYPE_CHECKING:
 
 
 class TestCase(Base, TimestampMixin, TableNameMixin):
-
     id: Mapped[str] = mapped_column(
         String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4())
     )
@@ -24,7 +22,7 @@ class TestCase(Base, TimestampMixin, TableNameMixin):
     )
     payload: Mapped[dict[str, Any]] = mapped_column(_JSONBCompat, nullable=False)
 
-    test_group: Mapped["TestGroup"] = relationship(lazy="selectin")
+    test_group: Mapped[TestGroup] = relationship(lazy="selectin")
 
     def __repr__(self) -> str:
         return f"<TestCase(id={self.id}, test_group_id={self.test_group_id})>"

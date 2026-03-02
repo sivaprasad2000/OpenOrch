@@ -19,7 +19,7 @@ class _JSONBCompat(TypeDecorator[Any]):
 
     def load_dialect_impl(self, dialect: Dialect) -> Any:
         if dialect.name == "postgresql":
-            return dialect.type_descriptor(JSONB())
+            return dialect.type_descriptor(JSONB())  # type: ignore[no-untyped-call]
         return dialect.type_descriptor(JSON())
 
 

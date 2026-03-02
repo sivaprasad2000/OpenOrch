@@ -1,6 +1,3 @@
-
-from typing import Optional
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.test_case import TestCase
@@ -12,8 +9,7 @@ from app.schemas.test_case import TestCaseCreate, TestCaseUpdate
 
 
 class TestCaseService:
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.test_case_repo = TestCaseRepository(db)
         self.test_group_repo = TestGroupRepository(db)
@@ -52,13 +48,11 @@ class TestCaseService:
         self, user_id: str, test_group_id: str, skip: int = 0, limit: int = 100
     ) -> list[TestCase]:
         await self._get_accessible_test_group(user_id, test_group_id)
-        return await self.test_case_repo.get_by_test_group_id(
-            test_group_id, skip=skip, limit=limit
-        )
+        return await self.test_case_repo.get_by_test_group_id(test_group_id, skip=skip, limit=limit)
 
     async def get_test_case(
         self, user_id: str, test_group_id: str, test_case_id: str
-    ) -> Optional[TestCase]:
+    ) -> TestCase | None:
         await self._get_accessible_test_group(user_id, test_group_id)
 
         test_case = await self.test_case_repo.get_by_id(test_case_id)
@@ -69,7 +63,7 @@ class TestCaseService:
 
     async def update_test_case(
         self, user_id: str, test_group_id: str, test_case_id: str, data: TestCaseUpdate
-    ) -> Optional[TestCase]:
+    ) -> TestCase | None:
         await self._get_accessible_test_group(user_id, test_group_id)
 
         test_case = await self.test_case_repo.get_by_id(test_case_id)
@@ -86,9 +80,7 @@ class TestCaseService:
             await self.db.rollback()
             raise
 
-    async def delete_test_case(
-        self, user_id: str, test_group_id: str, test_case_id: str
-    ) -> bool:
+    async def delete_test_case(self, user_id: str, test_group_id: str, test_case_id: str) -> bool:
         await self._get_accessible_test_group(user_id, test_group_id)
 
         test_case = await self.test_case_repo.get_by_id(test_case_id)

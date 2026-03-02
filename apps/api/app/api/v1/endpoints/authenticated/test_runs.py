@@ -1,4 +1,3 @@
-
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -30,7 +29,7 @@ def get_test_group_run_service(
 )
 async def run_test_case(
     test_case_id: str,
-    config: RunConfig = RunConfig(),  # noqa: B008
+    config: RunConfig = RunConfig(),
     current_user: dict = Depends(get_current_user),
     service: TestRunService = Depends(get_test_run_service),
 ) -> Any:
@@ -38,11 +37,11 @@ async def run_test_case(
     try:
         return await service.run_test_case(user_id, test_case_id, config)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except LookupError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     except RuntimeError as e:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e)) from e
 
 
 @router.post(
@@ -52,7 +51,7 @@ async def run_test_case(
 )
 async def run_test_group(
     test_group_id: str,
-    config: RunConfig = RunConfig(),  # noqa: B008
+    config: RunConfig = RunConfig(),
     current_user: dict = Depends(get_current_user),
     service: TestGroupRunService = Depends(get_test_group_run_service),
 ) -> Any:
@@ -60,11 +59,11 @@ async def run_test_group(
     try:
         return await service.run_test_group(user_id, test_group_id, config)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except LookupError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     except RuntimeError as e:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e)) from e
 
 
 @router.get("/test-runs/{run_id}", response_model=TestRunResponse)
@@ -77,7 +76,7 @@ async def get_test_run(
     try:
         test_run = await service.get_test_run(user_id, run_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
     if not test_run:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Test run not found")
@@ -100,7 +99,7 @@ async def get_player_data(
     try:
         test_run = await service.get_test_run(user_id, run_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
     if not test_run:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Test run not found")
@@ -135,9 +134,9 @@ async def list_runs_for_test_case(
     try:
         return await service.list_runs_for_test_case(user_id, test_case_id, skip=skip, limit=limit)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except LookupError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.get("/test-group-runs/{group_run_id}", response_model=TestGroupRunResponse)
@@ -150,7 +149,7 @@ async def get_test_group_run(
     try:
         group_run = await service.get_test_group_run(user_id, group_run_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
     if not group_run:
         raise HTTPException(
@@ -174,6 +173,6 @@ async def list_runs_for_test_group(
             user_id, test_group_id, skip=skip, limit=limit
         )
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except LookupError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e

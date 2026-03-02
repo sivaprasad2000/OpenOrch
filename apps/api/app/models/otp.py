@@ -1,5 +1,4 @@
-
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -8,7 +7,6 @@ from app.models.base import Base, TimestampMixin
 
 
 class OTP(Base, TimestampMixin):
-
     __tablename__ = "otps"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
@@ -19,10 +17,10 @@ class OTP(Base, TimestampMixin):
 
     @staticmethod
     def generate_expiry(minutes: int = 10) -> datetime:
-        return datetime.now(timezone.utc) + timedelta(minutes=minutes)
+        return datetime.now(UTC) + timedelta(minutes=minutes)
 
     def is_expired(self) -> bool:
-        return datetime.now(timezone.utc) > self.expires_at
+        return datetime.now(UTC) > self.expires_at
 
     def is_valid(self) -> bool:
         return not self.is_expired() and not self.is_used

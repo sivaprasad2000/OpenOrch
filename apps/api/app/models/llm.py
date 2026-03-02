@@ -1,8 +1,7 @@
-
 from __future__ import annotations
 
-import uuid
 from typing import TYPE_CHECKING
+import uuid
 
 from sqlalchemy import Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -15,7 +14,6 @@ if TYPE_CHECKING:
 
 
 class LLM(Base, TimestampMixin, TableNameMixin):
-
     id: Mapped[str] = mapped_column(
         String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4())
     )
@@ -29,7 +27,7 @@ class LLM(Base, TimestampMixin, TableNameMixin):
     api_key: Mapped[str] = mapped_column(String(500), nullable=False)
     model_name: Mapped[str] = mapped_column(String(255), nullable=False, server_default="")
 
-    organization: Mapped["Organization"] = relationship(
+    organization: Mapped[Organization] = relationship(
         foreign_keys=[organization_id], lazy="selectin"
     )
 

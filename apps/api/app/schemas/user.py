@@ -1,7 +1,6 @@
-
 from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserBase(BaseModel):
@@ -14,9 +13,9 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    email: Optional[EmailStr] = None
-    password: Optional[str] = Field(None, min_length=8, max_length=100)
+    name: str | None = Field(None, min_length=1, max_length=255)
+    email: EmailStr | None = None
+    password: str | None = Field(None, min_length=8, max_length=100)
 
 
 class UserResponse(UserBase):
@@ -49,7 +48,7 @@ class UserMeResponse(UserBase):
     is_verified: bool
     created_at: datetime
     updated_at: datetime
-    active_organization: Optional[ActiveOrganizationInfo] = None
+    active_organization: ActiveOrganizationInfo | None = None
     organizations: list[UserOrganizationInfo] = []
 
     model_config = ConfigDict(from_attributes=True)

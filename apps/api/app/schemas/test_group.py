@@ -1,4 +1,3 @@
-
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -7,7 +6,6 @@ from app.models.test_group import TestGroupStatus
 
 
 class TestGroupBase(BaseModel):
-
     name: str = Field(..., min_length=1, max_length=255)
     description: str | None = None
     base_url: str | None = Field(None, max_length=2048)
@@ -15,12 +13,10 @@ class TestGroupBase(BaseModel):
 
 
 class TestGroupCreate(TestGroupBase):
-
     pass
 
 
 class TestGroupUpdate(BaseModel):
-
     name: str | None = Field(None, min_length=1, max_length=255)
     description: str | None = None
     base_url: str | None = Field(None, max_length=2048)
@@ -29,7 +25,6 @@ class TestGroupUpdate(BaseModel):
 
 
 class TestGroupResponse(TestGroupBase):
-
     id: str
     status: TestGroupStatus
     organization_id: str

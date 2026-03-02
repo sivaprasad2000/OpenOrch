@@ -1,4 +1,3 @@
-
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -28,7 +27,7 @@ async def list_llms(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
-        )
+        ) from e
 
 
 @router.post("/llms", response_model=LLMResponse, status_code=status.HTTP_201_CREATED)
@@ -45,7 +44,7 @@ async def create_llm(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
-        )
+        ) from e
 
 
 @router.patch("/llms/{llm_id}", response_model=LLMResponse)
@@ -59,7 +58,7 @@ async def update_llm(
     try:
         updated = await llm_service.update_llm(user_id, llm_id, llm_data)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
     if not updated:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="LLM not found")
@@ -81,7 +80,7 @@ async def delete_llm(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
-        )
+        ) from e
 
     if not deleted:
         raise HTTPException(

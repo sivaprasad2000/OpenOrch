@@ -1,4 +1,3 @@
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,8 +6,7 @@ from app.repositories.base import BaseRepository
 
 
 class TestCaseRepository(BaseRepository[TestCase]):
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         super().__init__(TestCase, db)
 
     async def get_by_test_group_id(

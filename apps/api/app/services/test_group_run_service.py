@@ -1,6 +1,3 @@
-
-from typing import Optional
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.test_group_run import GroupRunStatus, TestGroupRun
@@ -13,8 +10,7 @@ from app.services.test_run_service import TestRunService
 
 
 class TestGroupRunService:
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.group_run_repo = TestGroupRunRepository(db)
         self.test_group_repo = TestGroupRepository(db)
@@ -64,9 +60,7 @@ class TestGroupRunService:
         await self.db.refresh(created_group_run)
         return created_group_run
 
-    async def get_test_group_run(
-        self, user_id: str, group_run_id: str
-    ) -> Optional[TestGroupRun]:
+    async def get_test_group_run(self, user_id: str, group_run_id: str) -> TestGroupRun | None:
         user = await self.user_repo.get_by_id(user_id)
         if not user or not user.active_organization_id:
             raise ValueError("No active organization set")
@@ -92,6 +86,4 @@ class TestGroupRunService:
         if not test_group or test_group.organization_id != user.active_organization_id:
             raise LookupError("Test group not found")
 
-        return await self.group_run_repo.get_by_test_group_id(
-            test_group_id, skip=skip, limit=limit
-        )
+        return await self.group_run_repo.get_by_test_group_id(test_group_id, skip=skip, limit=limit)

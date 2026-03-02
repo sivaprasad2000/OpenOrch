@@ -1,6 +1,3 @@
-
-from typing import Optional
-
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,13 +6,12 @@ from app.repositories.base import BaseRepository
 
 
 class UserOrganizationRepository(BaseRepository[UserOrganization]):
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         super().__init__(UserOrganization, db)
 
     async def get_by_user_and_org(
         self, user_id: str, organization_id: str
-    ) -> Optional[UserOrganization]:
+    ) -> UserOrganization | None:
         result = await self.db.execute(
             select(UserOrganization).where(
                 and_(
@@ -32,13 +28,9 @@ class UserOrganizationRepository(BaseRepository[UserOrganization]):
         )
         return list(result.scalars().all())
 
-    async def get_by_organization_id(
-        self, organization_id: str
-    ) -> list[UserOrganization]:
+    async def get_by_organization_id(self, organization_id: str) -> list[UserOrganization]:
         result = await self.db.execute(
-            select(UserOrganization).where(
-                UserOrganization.organization_id == organization_id
-            )
+            select(UserOrganization).where(UserOrganization.organization_id == organization_id)
         )
         return list(result.scalars().all())
 

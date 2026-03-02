@@ -129,7 +129,7 @@ class OpenAIClient(LLMClient):
 
         resp = await self._client.chat.completions.create(
             model=model,
-            messages=api_messages,
+            messages=api_messages,  # type: ignore[arg-type]
             max_tokens=max_tokens,
             temperature=temperature,
         )

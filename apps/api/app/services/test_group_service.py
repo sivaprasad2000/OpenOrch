@@ -1,6 +1,3 @@
-
-from typing import Optional
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.test_group import TestGroup, TestGroupStatus
@@ -10,8 +7,7 @@ from app.schemas.test_group import TestGroupCreate, TestGroupUpdate
 
 
 class TestGroupService:
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.test_group_repo = TestGroupRepository(db)
         self.user_repo = UserRepository(db)
@@ -50,9 +46,7 @@ class TestGroupService:
             user.active_organization_id, skip=skip, limit=limit
         )
 
-    async def get_test_group(
-        self, user_id: str, test_group_id: str
-    ) -> Optional[TestGroup]:
+    async def get_test_group(self, user_id: str, test_group_id: str) -> TestGroup | None:
         user = await self.user_repo.get_by_id(user_id)
         if not user or not user.active_organization_id:
             raise ValueError("No active organization set")
@@ -65,7 +59,7 @@ class TestGroupService:
 
     async def update_test_group(
         self, user_id: str, test_group_id: str, data: TestGroupUpdate
-    ) -> Optional[TestGroup]:
+    ) -> TestGroup | None:
         user = await self.user_repo.get_by_id(user_id)
         if not user or not user.active_organization_id:
             raise ValueError("No active organization set")

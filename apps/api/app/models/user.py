@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import hashlib
@@ -15,7 +14,6 @@ if TYPE_CHECKING:
 
 
 class User(Base, TimestampMixin, TableNameMixin):
-
     __tablename__ = "users"  # type: ignore[assignment]
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True, index=True)
@@ -27,10 +25,10 @@ class User(Base, TimestampMixin, TableNameMixin):
         ForeignKey("organizations.id", ondelete="SET NULL"), nullable=True
     )
 
-    user_organizations: Mapped[list["UserOrganization"]] = relationship(
+    user_organizations: Mapped[list[UserOrganization]] = relationship(
         back_populates="user", cascade="all, delete-orphan", lazy="selectin"
     )
-    active_organization: Mapped["Organization | None"] = relationship(
+    active_organization: Mapped[Organization | None] = relationship(
         foreign_keys=[active_organization_id], lazy="selectin"
     )
 

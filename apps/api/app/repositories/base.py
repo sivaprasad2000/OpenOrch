@@ -1,5 +1,4 @@
-
-from typing import Any, Generic, Optional, Type, TypeVar
+from typing import Any, Generic, TypeVar
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,8 +9,7 @@ ModelType = TypeVar("ModelType", bound=Base)
 
 
 class BaseRepository(Generic[ModelType]):
-
-    def __init__(self, model: Type[ModelType], db: AsyncSession):
+    def __init__(self, model: type[ModelType], db: AsyncSession) -> None:
         self.model = model
         self.db = db
 
@@ -21,9 +19,9 @@ class BaseRepository(Generic[ModelType]):
         await self.db.refresh(obj)
         return obj
 
-    async def get_by_id(self, id: Any) -> Optional[ModelType]:
+    async def get_by_id(self, item_id: Any) -> ModelType | None:
         result = await self.db.execute(
-            select(self.model).where(self.model.id == id)  # type: ignore[attr-defined]
+            select(self.model).where(self.model.id == item_id)  # type: ignore[attr-defined]
         )
         return result.scalar_one_or_none()
 
@@ -31,7 +29,7 @@ class BaseRepository(Generic[ModelType]):
         self,
         skip: int = 0,
         limit: int = 100,
-        order_by: Optional[Any] = None,
+        order_by: Any | None = None,
     ) -> list[ModelType]:
         query = select(self.model).offset(skip).limit(limit)
 
@@ -51,14 +49,12 @@ class BaseRepository(Generic[ModelType]):
         await self.db.flush()
 
     async def count(self) -> int:
-        result = await self.db.execute(
-            select(func.count()).select_from(self.model)
-        )
+        result = await self.db.execute(select(func.count()).select_from(self.model))
         return result.scalar() or 0
 
-    async def exists(self, id: Any) -> bool:
+    async def exists(self, item_id: Any) -> bool:
         result = await self.db.execute(
-            select(func.count()).select_from(self.model).where(self.model.id == id)  # type: ignore[attr-defined]
+            select(func.count()).select_from(self.model).where(self.model.id == item_id)  # type: ignore[attr-defined]
         )
         count = result.scalar() or 0
         return count > 0

@@ -1,6 +1,3 @@
-
-from typing import Optional
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,14 +6,11 @@ from app.repositories.base import BaseRepository
 
 
 class OrganizationRepository(BaseRepository[Organization]):
-
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         super().__init__(Organization, db)
 
-    async def get_by_name(self, name: str) -> Optional[Organization]:
-        result = await self.db.execute(
-            select(Organization).where(Organization.name == name)
-        )
+    async def get_by_name(self, name: str) -> Organization | None:
+        result = await self.db.execute(select(Organization).where(Organization.name == name))
         return result.scalar_one_or_none()
 
     async def name_exists(self, name: str) -> bool:

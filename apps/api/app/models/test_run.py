@@ -1,17 +1,16 @@
-
 from __future__ import annotations
 
-import enum
-import uuid
 from datetime import datetime
+import enum
 from typing import TYPE_CHECKING, Any
+import uuid
 
 from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TableNameMixin, TimestampMixin
-from app.models.types import _JSONBCompat
 from app.models.test_group_run import BrowserType
+from app.models.types import _JSONBCompat
 
 if TYPE_CHECKING:
     from app.models.test_case import TestCase
@@ -26,7 +25,6 @@ class RunStatus(str, enum.Enum):
 
 
 class TestRun(Base, TimestampMixin, TableNameMixin):
-
     id: Mapped[str] = mapped_column(
         String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4())
     )
@@ -53,15 +51,11 @@ class TestRun(Base, TimestampMixin, TableNameMixin):
     recording_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     trace_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
-    started_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    completed_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    test_case: Mapped["TestCase | None"] = relationship(lazy="selectin")
-    test_group_run: Mapped["TestGroupRun | None"] = relationship(
+    test_case: Mapped[TestCase | None] = relationship(lazy="selectin")
+    test_group_run: Mapped[TestGroupRun | None] = relationship(
         back_populates="test_runs", lazy="selectin"
     )
 
