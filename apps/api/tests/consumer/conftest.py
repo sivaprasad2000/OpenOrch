@@ -1,7 +1,7 @@
-
-import pytest
 from typing import Any
 from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from consumer.be_client import BEClient
 
@@ -41,7 +41,6 @@ def mock_execute_test():
 
 
 class MockMessage:
-
     def __init__(self, body: bytes) -> None:
         self.body = body
         self.acked: bool = False
@@ -60,7 +59,7 @@ class MockMessage:
             self._msg = msg
             self._requeue = requeue
 
-        async def __aenter__(self) -> "_MockMessage._ProcessContext":
+        async def __aenter__(self) -> "MockMessage._ProcessContext":
             return self
 
         async def __aexit__(self, exc_type, exc_val, exc_tb) -> bool:
@@ -104,4 +103,5 @@ def mock_client() -> AsyncMock:
 @pytest.fixture
 def valid_message() -> MockMessage:
     import json
+
     return MockMessage(json.dumps({"run_id": "run-abc", "test_case_id": "case-abc"}).encode())

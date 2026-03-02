@@ -1,5 +1,3 @@
-
-import pytest
 from fastapi.testclient import TestClient
 
 
@@ -21,6 +19,7 @@ def _create_llm(client: TestClient, headers: dict, name: str = "Test LLM") -> di
 # ---------------------------------------------------------------------------
 # set_active_llm
 # ---------------------------------------------------------------------------
+
 
 def test_set_active_llm_success(client: TestClient, auth: dict):
     llm = _create_llm(client, auth["headers"])
@@ -98,6 +97,7 @@ def test_set_active_llm_non_member_forbidden(client: TestClient, auth: dict, aut
 def test_set_active_llm_non_owner_member_forbidden(client: TestClient, auth: dict, db_session):
     """A regular member (not owner/admin) cannot set the active LLM."""
     import asyncio
+
     from app.core.security import create_access_token
     from app.models.user import User
     from app.models.user_organization import OrgRole, UserOrganization
@@ -164,6 +164,7 @@ def test_set_active_llm_nonexistent_llm_rejected(client: TestClient, auth: dict)
 # clear_active_llm  DELETE /organizations/{id}/active-llm
 # ---------------------------------------------------------------------------
 
+
 def test_clear_active_llm_success(client: TestClient, auth: dict):
     llm = _create_llm(client, auth["headers"])
     client.put(
@@ -210,6 +211,7 @@ def test_clear_active_llm_unauthenticated(client: TestClient, auth: dict):
 # ---------------------------------------------------------------------------
 # GET /llms  is_active flag
 # ---------------------------------------------------------------------------
+
 
 def test_list_llms_reflects_active(client: TestClient, auth: dict):
     llm1 = _create_llm(client, auth["headers"], name="LLM 1")

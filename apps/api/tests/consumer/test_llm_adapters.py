@@ -51,6 +51,7 @@ USER_ONLY_MESSAGES = [
 # SDK mock factories
 # ---------------------------------------------------------------------------
 
+
 def _make_openai_sdk_mock() -> tuple[MagicMock, MagicMock]:
     """Return (sdk_module_mock, async_client_mock)."""
     mock_client = AsyncMock()
@@ -91,6 +92,7 @@ def _make_google_sdk_mock() -> tuple[MagicMock, MagicMock, MagicMock]:
 
 # Anthropic
 
+
 def _anthropic_text_block(text: str) -> MagicMock:
     block = MagicMock()
     block.type = "text"
@@ -118,6 +120,7 @@ def _anthropic_response(*blocks: MagicMock) -> MagicMock:
 
 
 # OpenAI / OpenAI-compatible
+
 
 def _openai_text_response(text: str) -> MagicMock:
     msg = MagicMock()
@@ -169,6 +172,7 @@ def _openai_multi_tool_response(calls: list[tuple[str, str, str]]) -> MagicMock:
 
 # Google
 
+
 def _google_text_part(text: str) -> MagicMock:
     part = MagicMock()
     part.text = text
@@ -205,8 +209,8 @@ def _google_response(*parts: MagicMock) -> MagicMock:
 # AnthropicAdapter
 # ---------------------------------------------------------------------------
 
-class TestAnthropicAdapter:
 
+class TestAnthropicAdapter:
     @pytest.fixture(autouse=True)
     def mock_sdk(self):
         mock_sdk, mock_client = _make_anthropic_sdk_mock()
@@ -316,8 +320,8 @@ class TestAnthropicAdapter:
 # OpenAIAdapter
 # ---------------------------------------------------------------------------
 
-class TestOpenAIAdapter:
 
+class TestOpenAIAdapter:
     @pytest.fixture(autouse=True)
     def mock_sdk(self):
         mock_sdk, mock_client = _make_openai_sdk_mock()
@@ -337,9 +341,7 @@ class TestOpenAIAdapter:
         assert result["tool_calls"] == []
 
     async def test_tool_call_response(self):
-        self.mock_client.chat.completions.create = AsyncMock(
-            return_value=_openai_tool_response()
-        )
+        self.mock_client.chat.completions.create = AsyncMock(return_value=_openai_tool_response())
         adapter = OpenAIAdapter(api_key="sk-test", model_name="gpt-4o")
         result = await adapter.chat(messages=USER_ONLY_MESSAGES, tools=SAMPLE_TOOLS)
 
@@ -352,10 +354,12 @@ class TestOpenAIAdapter:
 
     async def test_multiple_tool_calls(self):
         self.mock_client.chat.completions.create = AsyncMock(
-            return_value=_openai_multi_tool_response([
-                ("c1", "browser_click", '{"selector": "#a"}'),
-                ("c2", "browser_click", '{"selector": "#b"}'),
-            ])
+            return_value=_openai_multi_tool_response(
+                [
+                    ("c1", "browser_click", '{"selector": "#a"}'),
+                    ("c2", "browser_click", '{"selector": "#b"}'),
+                ]
+            )
         )
         adapter = OpenAIAdapter(api_key="sk-test", model_name="gpt-4o")
         result = await adapter.chat(messages=USER_ONLY_MESSAGES, tools=SAMPLE_TOOLS)
@@ -412,9 +416,7 @@ class TestOpenAIAdapter:
             await adapter.chat(messages=USER_ONLY_MESSAGES, tools=[])
 
     def test_custom_base_url_passed_to_client(self):
-        adapter = OpenAIAdapter(
-            api_key="sk-test", model_name="gpt-4o", base_url="https://custom.ai/v1"
-        )
+        OpenAIAdapter(api_key="sk-test", model_name="gpt-4o", base_url="https://custom.ai/v1")
         self.mock_sdk.AsyncOpenAI.assert_called_once_with(
             api_key="sk-test", base_url="https://custom.ai/v1"
         )
@@ -424,8 +426,8 @@ class TestOpenAIAdapter:
 # GoogleAdapter
 # ---------------------------------------------------------------------------
 
-class TestGoogleAdapter:
 
+class TestGoogleAdapter:
     @pytest.fixture(autouse=True)
     def mock_sdk(self):
         mock_genai, mock_types, mock_client = _make_google_sdk_mock()
@@ -436,11 +438,14 @@ class TestGoogleAdapter:
         mock_google_ns = MagicMock()
         mock_google_ns.genai = mock_genai
 
-        with patch.dict(sys.modules, {
-            "google": mock_google_ns,
-            "google.genai": mock_genai,
-            "google.genai.types": mock_types,
-        }):
+        with patch.dict(
+            sys.modules,
+            {
+                "google": mock_google_ns,
+                "google.genai": mock_genai,
+                "google.genai.types": mock_types,
+            },
+        ):
             yield
 
     async def test_text_response(self):
@@ -538,14 +543,14 @@ class TestGoogleAdapter:
 # ---------------------------------------------------------------------------
 
 _COMPATIBLE_ADAPTERS = [
-    (MistralAdapter,    "https://api.mistral.ai/v1"),
-    (CohereAdapter,     "https://api.cohere.com/compatibility/v1"),
-    (MetaAdapter,       "https://api.llama.com/v1"),
+    (MistralAdapter, "https://api.mistral.ai/v1"),
+    (CohereAdapter, "https://api.cohere.com/compatibility/v1"),
+    (MetaAdapter, "https://api.llama.com/v1"),
     (OpenRouterAdapter, "https://openrouter.ai/api/v1"),
 ]
 
 
-@pytest.mark.parametrize("adapter_cls,expected_base_url", _COMPATIBLE_ADAPTERS)
+@pytest.mark.parametrize(("adapter_cls", "expected_base_url"), _COMPATIBLE_ADAPTERS)
 def test_compatible_adapter_uses_correct_base_url(adapter_cls, expected_base_url):
     mock_sdk, _ = _make_openai_sdk_mock()
     with patch.dict(sys.modules, {"openai": mock_sdk}):
@@ -554,8 +559,8 @@ def test_compatible_adapter_uses_correct_base_url(adapter_cls, expected_base_url
     assert kwargs.get("base_url") == expected_base_url
 
 
-@pytest.mark.parametrize("adapter_cls,_", _COMPATIBLE_ADAPTERS)
-async def test_compatible_adapter_text_response(adapter_cls, _):
+@pytest.mark.parametrize(("adapter_cls", "expected_base_url_unused"), _COMPATIBLE_ADAPTERS)
+async def test_compatible_adapter_text_response(adapter_cls, expected_base_url_unused):
     mock_sdk, mock_client = _make_openai_sdk_mock()
     mock_client.chat.completions.create = AsyncMock(
         return_value=_openai_text_response("Task complete")
@@ -568,8 +573,8 @@ async def test_compatible_adapter_text_response(adapter_cls, _):
     assert result["tool_calls"] == []
 
 
-@pytest.mark.parametrize("adapter_cls,_", _COMPATIBLE_ADAPTERS)
-async def test_compatible_adapter_tool_call(adapter_cls, _):
+@pytest.mark.parametrize(("adapter_cls", "expected_base_url_unused"), _COMPATIBLE_ADAPTERS)
+async def test_compatible_adapter_tool_call(adapter_cls, expected_base_url_unused):
     mock_sdk, mock_client = _make_openai_sdk_mock()
     mock_client.chat.completions.create = AsyncMock(
         return_value=_openai_tool_response(
@@ -590,8 +595,8 @@ async def test_compatible_adapter_tool_call(adapter_cls, _):
 # Factory
 # ---------------------------------------------------------------------------
 
-class TestFactory:
 
+class TestFactory:
     def _openai_ctx(self):
         mock_sdk, _ = _make_openai_sdk_mock()
         return patch.dict(sys.modules, {"openai": mock_sdk})
@@ -604,11 +609,14 @@ class TestFactory:
         mock_genai, mock_types, _ = _make_google_sdk_mock()
         mock_google_ns = MagicMock()
         mock_google_ns.genai = mock_genai
-        return patch.dict(sys.modules, {
-            "google": mock_google_ns,
-            "google.genai": mock_genai,
-            "google.genai.types": mock_types,
-        })
+        return patch.dict(
+            sys.modules,
+            {
+                "google": mock_google_ns,
+                "google.genai": mock_genai,
+                "google.genai.types": mock_types,
+            },
+        )
 
     def test_anthropic_returns_anthropic_adapter(self):
         with self._anthropic_ctx():

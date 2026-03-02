@@ -1,6 +1,5 @@
-
-import pytest
 from fastapi.testclient import TestClient
+import pytest
 
 from app.core.security import create_access_token
 
@@ -11,11 +10,7 @@ _SKIP_UNIMPLEMENTED = pytest.mark.skip(reason="Endpoint not implemented in curre
 def test_create_user(client: TestClient):
     response = client.post(
         "/api/v1/users",
-        json={
-            "email": "test@example.com",
-            "name": "Test User",
-            "password": "securepassword123"
-        }
+        json={"email": "test@example.com", "name": "Test User", "password": "securepassword123"},
     )
     assert response.status_code == 201
     data = response.json()
@@ -28,11 +23,7 @@ def test_create_user(client: TestClient):
 
 @_SKIP_UNIMPLEMENTED
 def test_create_user_duplicate_email(client: TestClient):
-    user_data = {
-        "email": "duplicate@example.com",
-        "name": "User One",
-        "password": "password123"
-    }
+    user_data = {"email": "duplicate@example.com", "name": "User One", "password": "password123"}
 
     response1 = client.post("/api/v1/users", json=user_data)
     assert response1.status_code == 201
@@ -46,11 +37,7 @@ def test_create_user_duplicate_email(client: TestClient):
 def test_create_user_invalid_email(client: TestClient):
     response = client.post(
         "/api/v1/users",
-        json={
-            "email": "invalid-email",
-            "name": "Test User",
-            "password": "password123"
-        }
+        json={"email": "invalid-email", "name": "Test User", "password": "password123"},
     )
     assert response.status_code == 422
 
@@ -59,11 +46,7 @@ def test_create_user_invalid_email(client: TestClient):
 def test_create_user_short_password(client: TestClient):
     response = client.post(
         "/api/v1/users",
-        json={
-            "email": "test@example.com",
-            "name": "Test User",
-            "password": "short"
-        }
+        json={"email": "test@example.com", "name": "Test User", "password": "short"},
     )
     assert response.status_code == 422
 
@@ -121,18 +104,11 @@ def test_list_users(client: TestClient):
 def test_update_user(client: TestClient):
     create_response = client.post(
         "/api/v1/users",
-        json={
-            "email": "update@example.com",
-            "name": "Original Name",
-            "password": "password123"
-        }
+        json={"email": "update@example.com", "name": "Original Name", "password": "password123"},
     )
     user_id = create_response.json()["id"]
 
-    response = client.put(
-        f"/api/v1/users/{user_id}",
-        json={"name": "Updated Name"}
-    )
+    response = client.put(f"/api/v1/users/{user_id}", json={"name": "Updated Name"})
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == "Updated Name"
@@ -143,11 +119,7 @@ def test_update_user(client: TestClient):
 def test_delete_user(client: TestClient):
     create_response = client.post(
         "/api/v1/users",
-        json={
-            "email": "delete@example.com",
-            "name": "Delete Test",
-            "password": "password123"
-        }
+        json={"email": "delete@example.com", "name": "Delete Test", "password": "password123"},
     )
     user_id = create_response.json()["id"]
 
@@ -162,11 +134,7 @@ def test_delete_user(client: TestClient):
 def test_verify_user_email(client: TestClient):
     create_response = client.post(
         "/api/v1/users",
-        json={
-            "email": "verify@example.com",
-            "name": "Verify Test",
-            "password": "password123"
-        }
+        json={"email": "verify@example.com", "name": "Verify Test", "password": "password123"},
     )
     user_id = create_response.json()["id"]
 
@@ -180,11 +148,7 @@ def test_verify_user_email(client: TestClient):
 def test_get_user_by_email(client: TestClient):
     client.post(
         "/api/v1/users",
-        json={
-            "email": "emailtest@example.com",
-            "name": "Email Test",
-            "password": "password123"
-        }
+        json={"email": "emailtest@example.com", "name": "Email Test", "password": "password123"},
     )
 
     response = client.get("/api/v1/users/email/emailtest@example.com")

@@ -1,15 +1,12 @@
-
-import pytest
 from fastapi.testclient import TestClient
-
 
 SAMPLE_PAYLOAD = {
     "title": "Login with valid credentials",
     "description": "Navigate to login page and sign in",
     "steps": [
-        {"action": "goto", "description": "Navigate to the login page"},
-        {"action": "fill", "description": "Enter email address in the email field"},
-        {"action": "fill", "description": "Enter password in the password field"},
+        {"action": "navigate", "description": "Navigate to the login page"},
+        {"action": "type", "description": "Enter email address in the email field"},
+        {"action": "type", "description": "Enter password in the password field"},
         {"action": "click", "description": "Click the submit button to sign in"},
     ],
 }

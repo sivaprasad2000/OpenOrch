@@ -1,10 +1,9 @@
-
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.user_service import UserService
-from app.schemas.user import UserCreate, UserUpdate
 from app.core.security import verify_password
+from app.schemas.user import UserCreate, UserUpdate
+from app.services.user_service import UserService
 
 
 @pytest.mark.asyncio
@@ -22,10 +21,7 @@ async def test_create_user(db_session: AsyncSession, sample_user_data: dict):
 
 
 @pytest.mark.asyncio
-async def test_create_user_duplicate_email(
-    db_session: AsyncSession,
-    sample_user_data: dict
-):
+async def test_create_user_duplicate_email(db_session: AsyncSession, sample_user_data: dict):
     service = UserService(db_session)
     user_data = UserCreate(**sample_user_data)
 
@@ -75,9 +71,7 @@ async def test_get_users(db_session: AsyncSession):
 
     for i in range(5):
         user_data = UserCreate(
-            email=f"user{i}@example.com",
-            name=f"User {i}",
-            password="password123"
+            email=f"user{i}@example.com", name=f"User {i}", password="password123"
         )
         await service.create_user(user_data)
 
@@ -102,10 +96,7 @@ async def test_update_user(db_session: AsyncSession, sample_user_data: dict):
 
 
 @pytest.mark.asyncio
-async def test_update_user_email(
-    db_session: AsyncSession,
-    sample_user_data: dict
-):
+async def test_update_user_email(db_session: AsyncSession, sample_user_data: dict):
     service = UserService(db_session)
     user_data = UserCreate(**sample_user_data)
 
@@ -122,13 +113,11 @@ async def test_update_user_email(
 
 @pytest.mark.asyncio
 async def test_update_user_duplicate_email(
-    db_session: AsyncSession,
-    sample_user_data: dict,
-    sample_user_data_2: dict
+    db_session: AsyncSession, sample_user_data: dict, sample_user_data_2: dict
 ):
     service = UserService(db_session)
 
-    user1 = await service.create_user(UserCreate(**sample_user_data))
+    await service.create_user(UserCreate(**sample_user_data))
     user2 = await service.create_user(UserCreate(**sample_user_data_2))
 
     update_data = UserUpdate(email=sample_user_data["email"])
@@ -182,8 +171,7 @@ async def test_authenticate_user(db_session: AsyncSession, sample_user_data: dic
     await service.create_user(user_data)
 
     authenticated_user = await service.authenticate_user(
-        sample_user_data["email"],
-        sample_user_data["password"]
+        sample_user_data["email"], sample_user_data["password"]
     )
 
     assert authenticated_user is not None
@@ -191,19 +179,13 @@ async def test_authenticate_user(db_session: AsyncSession, sample_user_data: dic
 
 
 @pytest.mark.asyncio
-async def test_authenticate_user_wrong_password(
-    db_session: AsyncSession,
-    sample_user_data: dict
-):
+async def test_authenticate_user_wrong_password(db_session: AsyncSession, sample_user_data: dict):
     service = UserService(db_session)
     user_data = UserCreate(**sample_user_data)
 
     await service.create_user(user_data)
 
-    authenticated_user = await service.authenticate_user(
-        sample_user_data["email"],
-        "wrongpassword"
-    )
+    authenticated_user = await service.authenticate_user(sample_user_data["email"], "wrongpassword")
 
     assert authenticated_user is None
 
@@ -212,10 +194,7 @@ async def test_authenticate_user_wrong_password(
 async def test_authenticate_user_not_found(db_session: AsyncSession):
     service = UserService(db_session)
 
-    authenticated_user = await service.authenticate_user(
-        "nonexistent@example.com",
-        "password123"
-    )
+    authenticated_user = await service.authenticate_user("nonexistent@example.com", "password123")
 
     assert authenticated_user is None
 
@@ -226,18 +205,14 @@ async def test_get_verified_users(db_session: AsyncSession):
 
     for i in range(3):
         user_data = UserCreate(
-            email=f"verified{i}@example.com",
-            name=f"Verified {i}",
-            password="password123"
+            email=f"verified{i}@example.com", name=f"Verified {i}", password="password123"
         )
         user = await service.create_user(user_data)
         await service.verify_user_email(user.id)
 
     for i in range(2):
         user_data = UserCreate(
-            email=f"unverified{i}@example.com",
-            name=f"Unverified {i}",
-            password="password123"
+            email=f"unverified{i}@example.com", name=f"Unverified {i}", password="password123"
         )
         await service.create_user(user_data)
 

@@ -1,15 +1,14 @@
-
 import asyncio
-from typing import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Generator
+from unittest.mock import AsyncMock, patch
 
+from fastapi.testclient import TestClient
 import pytest
 import pytest_asyncio
-from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
 
 from app.api.deps import get_database
-from app.core.config import settings
 from app.main import app
 from app.models.base import Base
 
@@ -58,15 +57,20 @@ async def db_session(test_db_engine) -> AsyncGenerator[AsyncSession, None]:
         await session.rollback()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def client(db_session: AsyncSession) -> Generator:
-
     async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
         yield db_session
 
     app.dependency_overrides[get_database] = override_get_db
 
-    with TestClient(app) as test_client:
+    with (
+        patch("app.main.init_db", new_callable=AsyncMock),
+        patch("app.main.init_rabbitmq", new_callable=AsyncMock),
+        patch("app.main.close_db", new_callable=AsyncMock),
+        patch("app.main.close_rabbitmq", new_callable=AsyncMock),
+        TestClient(app) as test_client,
+    ):
         yield test_client
 
     app.dependency_overrides.clear()
@@ -74,17 +78,9 @@ def client(db_session: AsyncSession) -> Generator:
 
 @pytest.fixture
 def sample_user_data() -> dict:
-    return {
-        "email": "test@example.com",
-        "name": "Test User",
-        "password": "securepassword123"
-    }
+    return {"email": "test@example.com", "name": "Test User", "password": "securepassword123"}
 
 
 @pytest.fixture
 def sample_user_data_2() -> dict:
-    return {
-        "email": "user2@example.com",
-        "name": "User Two",
-        "password": "anotherpassword456"
-    }
+    return {"email": "user2@example.com", "name": "User Two", "password": "anotherpassword456"}

@@ -1,10 +1,9 @@
-
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import get_password_hash
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
-from app.core.security import get_password_hash
 
 
 @pytest.mark.asyncio
@@ -16,7 +15,7 @@ async def test_create_user(db_session: AsyncSession):
         email="test@example.com",
         name="Test User",
         password=get_password_hash("password123"),
-        is_verified=False
+        is_verified=False,
     )
 
     created_user = await repo.create(user)
@@ -38,7 +37,7 @@ async def test_get_user_by_id(db_session: AsyncSession):
         email="test@example.com",
         name="Test User",
         password=get_password_hash("password123"),
-        is_verified=False
+        is_verified=False,
     )
     await repo.create(user)
     await db_session.commit()
@@ -59,7 +58,7 @@ async def test_get_user_by_email(db_session: AsyncSession):
         email="test@example.com",
         name="Test User",
         password=get_password_hash("password123"),
-        is_verified=False
+        is_verified=False,
     )
     await repo.create(user)
     await db_session.commit()
@@ -80,7 +79,7 @@ async def test_get_user_by_email_case_insensitive(db_session: AsyncSession):
         email="test@example.com",
         name="Test User",
         password=get_password_hash("password123"),
-        is_verified=False
+        is_verified=False,
     )
     await repo.create(user)
     await db_session.commit()
@@ -100,7 +99,7 @@ async def test_email_exists(db_session: AsyncSession):
         email="test@example.com",
         name="Test User",
         password=get_password_hash("password123"),
-        is_verified=False
+        is_verified=False,
     )
     await repo.create(user)
     await db_session.commit()
@@ -119,7 +118,7 @@ async def test_get_all_users(db_session: AsyncSession):
             email=f"user{i}@example.com",
             name=f"User {i}",
             password=get_password_hash("password123"),
-            is_verified=False
+            is_verified=False,
         )
         await repo.create(user)
     await db_session.commit()
@@ -138,7 +137,7 @@ async def test_update_user(db_session: AsyncSession):
         email="test@example.com",
         name="Test User",
         password=get_password_hash("password123"),
-        is_verified=False
+        is_verified=False,
     )
     created_user = await repo.create(user)
     await db_session.commit()
@@ -159,7 +158,7 @@ async def test_delete_user(db_session: AsyncSession):
         email="test@example.com",
         name="Test User",
         password=get_password_hash("password123"),
-        is_verified=False
+        is_verified=False,
     )
     await repo.create(user)
     await db_session.commit()
@@ -181,7 +180,7 @@ async def test_get_verified_users(db_session: AsyncSession):
             email=f"verified{i}@example.com",
             name=f"Verified User {i}",
             password=get_password_hash("password123"),
-            is_verified=True
+            is_verified=True,
         )
         await repo.create(user)
 
@@ -191,7 +190,7 @@ async def test_get_verified_users(db_session: AsyncSession):
             email=f"unverified{i}@example.com",
             name=f"Unverified User {i}",
             password=get_password_hash("password123"),
-            is_verified=False
+            is_verified=False,
         )
         await repo.create(user)
 
@@ -219,7 +218,7 @@ async def test_search_by_name(db_session: AsyncSession):
             email=email,
             name=name,
             password=get_password_hash("password123"),
-            is_verified=False
+            is_verified=False,
         )
         await repo.create(user)
     await db_session.commit()

@@ -80,8 +80,7 @@ def mock_browser() -> MagicMock:
 @pytest.fixture
 def mock_llm() -> AsyncMock:
     """A mock BaseLLMAdapter. Configure .chat.side_effect per test."""
-    llm = AsyncMock()
-    return llm
+    return AsyncMock()
 
 
 # ---------------------------------------------------------------------------
@@ -133,7 +132,7 @@ async def test_preflight_snapshot_failure_does_not_abort_step(
     """A failing pre-flight snapshot must not raise — the step should still run."""
     mock_browser.call_tool.side_effect = [
         RuntimeError("page not ready"),  # pre-flight fails
-        "Clicked",                       # LLM-requested click succeeds
+        "Clicked",  # LLM-requested click succeeds
     ]
     mock_llm.chat.side_effect = [_llm_calls("browser_click"), _llm_done()]
     result = await run_step(mock_browser, mock_llm, "click", "Click submit")
@@ -206,7 +205,7 @@ async def test_tool_calls_made_captures_result_for_each_call(
     mock_browser.call_tool.side_effect = [_PAGE_STATE, "Navigated to https://example.com"]
     mock_llm.chat.side_effect = [_llm_calls("browser_navigate"), _llm_done()]
     result = await run_step(mock_browser, mock_llm, "navigate", "Go to example.com")
-    assert result["tool_calls_made"][0]["result"] == _PAGE_STATE          # pre-flight
+    assert result["tool_calls_made"][0]["result"] == _PAGE_STATE  # pre-flight
     assert result["tool_calls_made"][1]["result"] == "Navigated to https://example.com"
 
 
@@ -429,9 +428,9 @@ async def test_unexpected_llm_exception_tool_calls_made_includes_preflight_and_e
 ) -> None:
     """tool_calls_made must contain the pre-flight, executed calls, and auto-snapshot."""
     mock_browser.call_tool.side_effect = [
-        _PAGE_STATE,                         # pre-flight snapshot
+        _PAGE_STATE,  # pre-flight snapshot
         "Navigated to https://example.com",  # browser_navigate
-        _PAGE_STATE,                         # auto-snapshot after navigate
+        _PAGE_STATE,  # auto-snapshot after navigate
     ]
     mock_llm.chat.side_effect = [_llm_calls("browser_navigate"), RuntimeError("crash")]
 
@@ -610,8 +609,8 @@ async def test_auto_snapshot_result_injected_as_user_message(
     """The auto-snapshot must appear as a user message in the next LLM call."""
     auto_snap_text = 'WebArea "Confirmation" heading "Success"'
     mock_browser.call_tool.side_effect = [
-        _PAGE_STATE,     # pre-flight
-        "Navigated",     # browser_navigate
+        _PAGE_STATE,  # pre-flight
+        "Navigated",  # browser_navigate
         auto_snap_text,  # auto-snapshot
     ]
     mock_llm.chat.side_effect = [_llm_calls("browser_navigate"), _llm_done()]
@@ -633,9 +632,9 @@ async def test_auto_snapshot_failure_is_recorded_but_does_not_abort_step(
 ) -> None:
     """A failing auto-snapshot must be recorded gracefully; the step must still pass."""
     mock_browser.call_tool.side_effect = [
-        _PAGE_STATE,               # pre-flight
-        "Clicked",                 # browser_click
-        RuntimeError("page gone"), # auto-snapshot fails
+        _PAGE_STATE,  # pre-flight
+        "Clicked",  # browser_click
+        RuntimeError("page gone"),  # auto-snapshot fails
     ]
     mock_llm.chat.side_effect = [_llm_calls("browser_click"), _llm_done()]
     result = await run_step(mock_browser, mock_llm, "click", "Click submit")
@@ -660,8 +659,8 @@ async def test_step_aborted_after_max_consecutive_errors(
     side_effects: list[Any] = [_PAGE_STATE]  # pre-flight
     for _ in range(_MAX_CONSECUTIVE_ERRORS - 1):
         side_effects.append(TimeoutError("timeout"))  # click error
-        side_effects.append(_PAGE_STATE)              # auto-snapshot
-    side_effects.append(TimeoutError("timeout"))      # final error → abort (no auto-snapshot)
+        side_effects.append(_PAGE_STATE)  # auto-snapshot
+    side_effects.append(TimeoutError("timeout"))  # final error → abort (no auto-snapshot)
 
     mock_browser.call_tool.side_effect = side_effects
     mock_llm.chat.return_value = _llm_calls("browser_click")
@@ -680,8 +679,8 @@ async def test_step_not_aborted_below_consecutive_error_threshold(
     side_effects: list[Any] = [_PAGE_STATE]  # pre-flight
     for _ in range(below):
         side_effects.append(TimeoutError("timeout"))  # error
-        side_effects.append(_PAGE_STATE)              # auto-snapshot
-    side_effects.append("Clicked!")   # success — counter resets
+        side_effects.append(_PAGE_STATE)  # auto-snapshot
+    side_effects.append("Clicked!")  # success — counter resets
     side_effects.append(_PAGE_STATE)  # auto-snapshot after success
 
     mock_llm.chat.side_effect = [
@@ -706,19 +705,19 @@ async def test_consecutive_error_counter_resets_after_successful_tool_call(
         side_effects.append(TimeoutError("t"))
         side_effects.append(_PAGE_STATE)
     # Success resets the counter, then we get below-threshold errors again.
-    side_effects.append("Clicked!")   # success
+    side_effects.append("Clicked!")  # success
     side_effects.append(_PAGE_STATE)  # auto-snapshot
     for _ in range(below):
         side_effects.append(TimeoutError("t"))
         side_effects.append(_PAGE_STATE)
-    side_effects.append("Clicked!")   # final success
+    side_effects.append("Clicked!")  # final success
     side_effects.append(_PAGE_STATE)
 
     mock_llm.chat.side_effect = [
         *[_llm_calls("browser_click")] * below,
-        _llm_calls("browser_click"),           # success
+        _llm_calls("browser_click"),  # success
         *[_llm_calls("browser_click")] * below,
-        _llm_calls("browser_click"),           # success
+        _llm_calls("browser_click"),  # success
         _llm_done(),
     ]
     mock_browser.call_tool.side_effect = side_effects

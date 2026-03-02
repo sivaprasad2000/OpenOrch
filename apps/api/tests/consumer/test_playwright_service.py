@@ -18,12 +18,12 @@ from unittest.mock import AsyncMock, MagicMock, call, patch
 import pytest
 
 from consumer.playwright_service import (
-    BrowserConfig,
-    PlaywrightService,
     _MAX_SNAPSHOT_CHARS,
     _T_CLICK,
     _T_NAVIGATE,
     _T_WAIT,
+    BrowserConfig,
+    PlaywrightService,
     _format_ax_tree,
 )
 
@@ -180,7 +180,7 @@ async def test_descriptions_are_non_empty_strings(service: PlaywrightService) ->
         assert len(schema["description"]) > 0
 
 
-@pytest.mark.parametrize("tool_name,expected_required", _TOOL_REQUIRED_PARAMS)
+@pytest.mark.parametrize(("tool_name", "expected_required"), _TOOL_REQUIRED_PARAMS)
 async def test_required_params_match_spec(
     service: PlaywrightService,
     tool_name: str,
@@ -208,7 +208,7 @@ async def test_call_tool_unknown_name_raises_value_error(service: PlaywrightServ
 
 
 async def test_call_tool_error_message_lists_available_tools(service: PlaywrightService) -> None:
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ValueError, match="Unknown browser tool") as exc_info:
         await service.call_tool("not_a_tool", {})
     for name in _ALL_TOOL_NAMES:
         assert name in str(exc_info.value)
@@ -584,9 +584,7 @@ async def test_select_option_passes_value_to_playwright(
     service: PlaywrightService,
     mock_page: MagicMock,
 ) -> None:
-    await service.call_tool(
-        "browser_select_option", {"selector": "#country", "value": "Canada"}
-    )
+    await service.call_tool("browser_select_option", {"selector": "#country", "value": "Canada"})
     mock_page.select_option.assert_awaited_once_with("#country", value="Canada")
 
 
@@ -639,9 +637,7 @@ async def test_wait_for_text_wraps_in_text_selector(
     mock_page: MagicMock,
 ) -> None:
     await service.call_tool("browser_wait_for", {"text": "Order confirmed"})
-    mock_page.wait_for_selector.assert_awaited_once_with(
-        "text=Order confirmed", timeout=_T_WAIT
-    )
+    mock_page.wait_for_selector.assert_awaited_once_with("text=Order confirmed", timeout=_T_WAIT)
     mock_page.wait_for_load_state.assert_not_awaited()
 
 
@@ -853,7 +849,7 @@ async def test_call_tool_does_not_raise_for_missing_required_args(
     """Validation must return a string, never raise."""
     try:
         result = await service.call_tool("browser_type", {})
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         pytest.fail(f"call_tool raised unexpectedly: {exc}")
     assert isinstance(result, str)
 

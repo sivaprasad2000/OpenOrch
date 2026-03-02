@@ -1,4 +1,3 @@
-
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -93,7 +92,7 @@ async def test_update_organization(db_session: AsyncSession) -> None:
 async def test_update_organization_duplicate_name(db_session: AsyncSession) -> None:
     service = OrganizationService(db_session)
 
-    org1 = await service.create_organization(OrganizationCreate(name="Org One"))
+    await service.create_organization(OrganizationCreate(name="Org One"))
     org2 = await service.create_organization(OrganizationCreate(name="Org Two"))
 
     update_data = OrganizationUpdate(name="Org One")

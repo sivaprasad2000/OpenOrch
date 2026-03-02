@@ -65,6 +65,7 @@ jobs:
       - name: Run tests
         env:
           SECRET_KEY: test-secret-key-for-ci
+          INTERNAL_SERVICE_SECRET: test-internal-secret-for-ci
         run: pytest tests/${{ matrix.suite }}/ -v --cov=app --cov-report=xml
 
       - uses: codecov/codecov-action@v4

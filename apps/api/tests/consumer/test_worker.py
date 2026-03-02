@@ -1,6 +1,5 @@
-
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import httpx
 import pytest
@@ -48,9 +47,9 @@ async def test_valid_message_step_count_matches_payload(mock_client):
         **mock_client.get_test_run.return_value,
         "test_case_payload": {
             "steps": [
-                {"action": "goto",  "params": {"url": "https://a.com"}},
+                {"action": "goto", "params": {"url": "https://a.com"}},
                 {"action": "click", "params": {"selector": "#b"}},
-                {"action": "fill",  "params": {"selector": "#c", "value": "d"}},
+                {"action": "fill", "params": {"selector": "#c", "value": "d"}},
             ]
         },
     }

@@ -1,14 +1,12 @@
-
 import json
-from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
 
 from consumer.executor import execute_test
 from consumer.storage import LocalStorageBackend, S3StorageBackend, create_storage_backend
-from tests.consumer.conftest import MockMessage
 from consumer.worker import handle_message
+from tests.consumer.conftest import MockMessage
 
 
 async def test_local_backend_creates_file(tmp_path):
@@ -133,7 +131,11 @@ async def test_executor_returns_recording_url_when_storage_provided(tmp_path):
     trace_zip.write_bytes(b"fake-trace")
 
     backend = LocalStorageBackend(recordings_dir=tmp_path / "r", base_url="http://localhost:8000")
-    run_detail = {"id": "run-abc", "test_case_payload": {"steps": []}, "llm_config": BASE_LLM_CONFIG}
+    run_detail = {
+        "id": "run-abc",
+        "test_case_payload": {"steps": []},
+        "llm_config": BASE_LLM_CONFIG,
+    }
 
     mcp_patcher = make_mcp_patcher()
     with (
@@ -154,7 +156,11 @@ async def test_executor_recording_file_is_created(tmp_path):
 
     storage_dir = tmp_path / "recordings"
     backend = LocalStorageBackend(recordings_dir=storage_dir, base_url="http://localhost:8000")
-    run_detail = {"id": "run-xyz", "test_case_payload": {"steps": []}, "llm_config": BASE_LLM_CONFIG}
+    run_detail = {
+        "id": "run-xyz",
+        "test_case_payload": {"steps": []},
+        "llm_config": BASE_LLM_CONFIG,
+    }
 
     mcp_patcher = make_mcp_patcher()
     with (
@@ -169,7 +175,11 @@ async def test_executor_recording_file_is_created(tmp_path):
 
 
 async def test_executor_no_storage_returns_null_recording_url():
-    run_detail = {"id": "run-abc", "test_case_payload": {"steps": []}, "llm_config": BASE_LLM_CONFIG}
+    run_detail = {
+        "id": "run-abc",
+        "test_case_payload": {"steps": []},
+        "llm_config": BASE_LLM_CONFIG,
+    }
 
     mcp_patcher = make_mcp_patcher()
     with (
@@ -220,9 +230,7 @@ async def test_worker_passes_recording_url_to_be(mock_client, tmp_path):
     async def _fake_with_recording(run_detail, storage=None):
         run_id = run_detail.get("id", "run")
         recording_url = (
-            f"http://localhost:8000/recordings/{run_id}-trace.zip"
-            if storage is not None
-            else None
+            f"http://localhost:8000/recordings/{run_id}-trace.zip" if storage is not None else None
         )
         return {
             "status": "passed",

@@ -2,12 +2,10 @@
 
 from unittest.mock import patch
 
-import pytest
 from fastapi.testclient import TestClient
 
 from app.core.config import settings
 from tests.routes.authenticated.conftest import setup_user_with_org
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -206,9 +204,9 @@ def test_player_defaults_started_at_seconds_for_legacy_steps(
     ).json()["id"]
 
     with patch("app.services.test_run_service.publish_test_run"):
-        run_id = client.post(
-            f"/api/v1/test-cases/{case_id}/run", headers=auth["headers"]
-        ).json()["id"]
+        run_id = client.post(f"/api/v1/test-cases/{case_id}/run", headers=auth["headers"]).json()[
+            "id"
+        ]
 
     # Patch with a step that has no started_at_seconds (simulates old data)
     legacy_step = {
@@ -248,9 +246,7 @@ def test_player_returns_404_for_unknown_run(client: TestClient, auth: dict) -> N
     assert resp.status_code == 404
 
 
-def test_player_returns_404_for_run_owned_by_other_user(
-    client: TestClient, auth: dict
-) -> None:
+def test_player_returns_404_for_run_owned_by_other_user(client: TestClient, auth: dict) -> None:
     run_id = _create_run_with_steps(client, auth["headers"])
 
     other = setup_user_with_org(client, email="other@example.com", org_name="Other Org")

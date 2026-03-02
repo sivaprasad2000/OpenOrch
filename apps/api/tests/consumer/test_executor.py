@@ -107,9 +107,8 @@ async def test_completed_at_not_before_started_at():
     with patcher, patch("consumer.executor.run_step", AsyncMock(return_value=PASSED_STEP_RESULT)):
         result = await execute_test(run_detail(steps=[]))
 
-    assert (
-        datetime.fromisoformat(result["completed_at"])
-        >= datetime.fromisoformat(result["started_at"])
+    assert datetime.fromisoformat(result["completed_at"]) >= datetime.fromisoformat(
+        result["started_at"]
     )
 
 
@@ -242,7 +241,10 @@ async def test_recording_url_set_when_video_found(tmp_path):
     with (
         patcher,
         patch("consumer.executor.run_step", AsyncMock(return_value=PASSED_STEP_RESULT)),
-        patch("consumer.executor._find_file", side_effect=lambda d, p: video_file if "webm" in p else None),
+        patch(
+            "consumer.executor._find_file",
+            side_effect=lambda d, p: video_file if "webm" in p else None,
+        ),
     ):
         result = await execute_test(run_detail(steps=[]), storage=mock_storage)
 

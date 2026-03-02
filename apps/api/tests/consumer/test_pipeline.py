@@ -1,9 +1,5 @@
-
 import asyncio
 import json
-from unittest.mock import AsyncMock, call
-
-import pytest
 
 from consumer.be_client import BEClient
 from consumer.worker import handle_message
@@ -131,7 +127,7 @@ async def test_empty_queue_produces_no_calls(mock_client):
 
 async def test_pipeline_step_results_written_to_be(mock_client):
     steps = [
-        {"action": "goto",  "params": {"url": "https://example.com"}},
+        {"action": "goto", "params": {"url": "https://example.com"}},
         {"action": "click", "params": {"selector": "#login"}},
     ]
     mock_client.get_test_run.return_value = make_run_detail("run-1", steps=steps)

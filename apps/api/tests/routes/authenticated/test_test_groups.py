@@ -1,5 +1,3 @@
-
-import pytest
 from fastapi.testclient import TestClient
 
 from app.core.security import create_access_token
@@ -71,14 +69,12 @@ def test_create_test_group_unauthenticated(client: TestClient):
 
 
 def test_create_test_group_no_active_org(client: TestClient):
-    import uuid
-    from app.core.security import create_access_token
-
     client.post(
         "/api/v1/auth/signup",
         json={"email": "noorg@example.com", "name": "No Org", "password": "password123"},
     )
     from app.models.user import User
+
     user_id = User.generate_id_from_email("noorg@example.com")
     token = create_access_token({"sub": user_id, "email": "noorg@example.com"})
 
