@@ -397,7 +397,7 @@ async def test_navigate_calls_goto_with_url(
 
 async def test_navigate_returns_confirmation_containing_url(service: PlaywrightService) -> None:
     result = await service.call_tool("browser_navigate", {"url": "https://example.com"})
-    assert "https://example.com" in result
+    assert result == "Navigated to https://example.com"
 
 
 # ---------------------------------------------------------------------------
