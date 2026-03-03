@@ -62,7 +62,14 @@ def create_application() -> FastAPI:
             # Resolve and validate to prevent path traversal attacks.
             file_path = (recordings_path / filename).resolve()
             try:
+                # Ensure the resolved file path is within the recordings directory.
+                file_path.relative_to(recordings_path)
+            except ValueError:
                 # Ensure the resolved path is within the recordings directory.
+
+            if not file_path.is_file():
+                raise HTTPException(status_code=404, detail="Recording not found")
+
                 file_path.relative_to(recordings_path)
             except ValueError:
                 raise HTTPException(status_code=404, detail="Recording not found")
