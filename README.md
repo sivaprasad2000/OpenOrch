@@ -1,6 +1,6 @@
 # OpenOrch
 
-LLM API token tracking and management platform. Monitor usage, enforce budgets, and manage access across your organization.
+Create auto healing test cases in plain english. Uses playwright.
 
 ## Structure
 
